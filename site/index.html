@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 项目实战：从零生成、验收到持续维护 · AI 项目实战</title>
+<script>(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
+</script>
+<style>:root{--bg:#faf9f7;--surface:#fff;--sidebar:#f3f2ee;--text:#1f2328;--text-2:#57606a;--border:#e4e2dc;--accent:#4f46e5;--accent-2:#7c3aed;--radius:10px;--shadow:0 1px 3px rgb(0 0 0/.08);--font-sans:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Cascadia Code",Consolas,"JetBrains Mono",monospace}
+[data-theme="dark"]{--bg:#101014;--surface:#18181f;--sidebar:#14141a;--text:#e6e6ea;--text-2:#9a9aa5;--border:#2a2a33;--accent:#818cf8;--accent-2:#a78bfa;--shadow:0 1px 3px rgb(0 0 0/.4)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 var(--font-sans)}
+a{color:var(--accent);text-decoration:none;transition:.15s ease}a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 20px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topbar .brand{font-weight:700;font-size:1.05rem;color:var(--text);white-space:nowrap}
+.topbar .brand small{color:var(--text-2);font-weight:400;margin-left:8px}
+.topbar .spacer{flex:1}
+.searchbox{position:relative;width:min(320px,40vw)}
+.searchbox input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:inherit}
+.searchbox input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.search-results{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);max-height:340px;overflow:auto;display:none}
+.search-results a{display:block;padding:8px 14px;color:var(--text);border-bottom:1px solid var(--border)}
+.search-results a:last-child{border-bottom:0}
+.search-results a b{color:var(--accent)}
+.search-results a small{display:block;color:var(--text-2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-empty{padding:10px 14px;color:var(--text-2);font-size:.9rem}
+.theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit}
+.theme-btn:hover{border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;align-items:start}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;padding:18px 14px 40px;background:var(--sidebar);border-right:1px solid var(--border)}
+.sidebar .group{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin:18px 10px 6px;font-weight:600}
+.sidebar a{display:block;padding:6px 10px;border-radius:8px;color:var(--text);font-size:.92rem;line-height:1.5;border-left:3px solid transparent;margin:1px 0}
+.sidebar a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);text-decoration:none}
+.sidebar a.active{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.content{padding:36px 32px 80px;min-width:0}
+article{max-width:76ch;margin:0 auto;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+article h1{font-size:1.9rem;line-height:1.35;margin:0 0 .8em}
+article h2{font-size:1.4rem;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--border)}
+article h3{font-size:1.15rem;margin:1.6em 0 .5em}
+article h4{font-size:1rem;margin:1.4em 0 .4em}
+article p{text-align:justify;margin:.9em 0}
+article ul,article ol{padding-left:1.6em;margin:.8em 0}
+article li{margin:.35em 0}
+article blockquote{margin:1.2em 0;padding:.8em 1.1em;background:var(--surface);border-left:3px solid var(--accent);border-radius:var(--radius);color:var(--text-2)}
+article blockquote p{margin:.3em 0;text-align:left}
+article hr{border:0;border-top:1px solid var(--border);margin:2em 0}
+article img{max-width:100%;border-radius:var(--radius)}
+code{font-family:var(--font-mono);font-size:.9em;background:color-mix(in srgb,var(--accent) 10%,transparent);padding:.15em .4em;border-radius:5px}
+pre{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1em 1.1em;overflow:auto;font-size:.88rem;line-height:1.6;margin:1.1em 0}
+pre code{background:none;padding:0}
+.code-wrap{position:relative;margin:1.1em 0}
+.code-wrap pre{margin:0}
+.copy-btn{position:absolute;top:8px;right:8px;z-index:2;border:1px solid var(--border);background:var(--bg);color:var(--text-2);border-radius:6px;padding:3px 9px;font-size:.75rem;cursor:pointer;opacity:0;transition:.15s ease;font-family:var(--font-sans)}
+.code-wrap:hover .copy-btn{opacity:1}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:#16a34a;border-color:#16a34a;opacity:1}
+.tbl-wrap{overflow:auto;margin:1.2em 0}
+article table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface);border-radius:var(--radius)}
+article th{background:var(--sidebar);font-weight:600;text-align:left}
+article th,article td{border:1px solid var(--border);padding:.5em .75em}
+article tbody tr:nth-child(even){background:color-mix(in srgb,var(--sidebar) 55%,transparent)}
+.pagenav{display:flex;justify-content:space-between;gap:12px;margin-top:3em;padding-top:1.2em;border-top:1px solid var(--border)}
+.pagenav a{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:46%}
+.pagenav a small{display:block;color:var(--text-2);font-size:.78rem}
+.pagenav a.next{text-align:right;margin-left:auto}
+footer{padding:26px 20px;color:var(--text-2);font-size:.85rem;text-align:center;border-top:1px solid var(--border)}
+.hamburger{display:none;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;color:var(--text)}
+@media (max-width:900px){
+.layout{display:block}
+.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;width:280px;transform:translateX(-100%);transition:transform .2s ease;height:100vh;border-right:1px solid var(--border)}
+.sidebar.open{transform:none;box-shadow:0 0 40px rgb(0 0 0/.25)}
+.hamburger{display:inline-block}
+.content{padding:24px 18px 60px}
+.searchbox{width:min(200px,38vw)}
+}
+@media print{.topbar,.sidebar,.pagenav,.copy-btn{display:none!important}.layout{display:block}.content{padding:0}.article,article{max-width:none}}
+.hl{background:transparent}
+:root:not([data-theme="dark"]) .hl{pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #ffffcc }
+.hl { background: #f0f0f0; }
+.hl .c { color: #60A0B0; font-style: italic } /* Comment */
+.hl .err { border: 1px solid #F00 } /* Error */
+.hl .k { color: #007020; font-weight: bold } /* Keyword */
+.hl .o { color: #666 } /* Operator */
+.hl .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.hl .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.hl .cp { color: #007020 } /* Comment.Preproc */
+.hl .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.hl .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.hl .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.hl .gd { color: #A00000 } /* Generic.Deleted */
+.hl .ge { font-style: italic } /* Generic.Emph */
+.hl .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F00 } /* Generic.Error */
+.hl .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.hl .gi { color: #00A000 } /* Generic.Inserted */
+.hl .go { color: #888 } /* Generic.Output */
+.hl .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.hl .gs { font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.hl .gt { color: #04D } /* Generic.Traceback */
+.hl .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.hl .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.hl .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.hl .kp { color: #007020 } /* Keyword.Pseudo */
+.hl .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.hl .kt { color: #902000 } /* Keyword.Type */
+.hl .m { color: #40A070 } /* Literal.Number */
+.hl .s { color: #4070A0 } /* Literal.String */
+.hl .na { color: #4070A0 } /* Name.Attribute */
+.hl .nb { color: #007020 } /* Name.Builtin */
+.hl .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.hl .no { color: #60ADD5 } /* Name.Constant */
+.hl .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.hl .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.hl .ne { color: #007020 } /* Name.Exception */
+.hl .nf { color: #06287E } /* Name.Function */
+.hl .nl { color: #002070; font-weight: bold } /* Name.Label */
+.hl .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.hl .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.hl .nv { color: #BB60D5 } /* Name.Variable */
+.hl .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.hl .w { color: #BBB } /* Text.Whitespace */
+.hl .mb { color: #40A070 } /* Literal.Number.Bin */
+.hl .mf { color: #40A070 } /* Literal.Number.Float */
+.hl .mh { color: #40A070 } /* Literal.Number.Hex */
+.hl .mi { color: #40A070 } /* Literal.Number.Integer */
+.hl .mo { color: #40A070 } /* Literal.Number.Oct */
+.hl .sa { color: #4070A0 } /* Literal.String.Affix */
+.hl .sb { color: #4070A0 } /* Literal.String.Backtick */
+.hl .sc { color: #4070A0 } /* Literal.String.Char */
+.hl .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.hl .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.hl .s2 { color: #4070A0 } /* Literal.String.Double */
+.hl .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.hl .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.hl .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.hl .sx { color: #C65D09 } /* Literal.String.Other */
+.hl .sr { color: #235388 } /* Literal.String.Regex */
+.hl .s1 { color: #4070A0 } /* Literal.String.Single */
+.hl .ss { color: #517918 } /* Literal.String.Symbol */
+.hl .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #06287E } /* Name.Function.Magic */
+.hl .vc { color: #BB60D5 } /* Name.Variable.Class */
+.hl .vg { color: #BB60D5 } /* Name.Variable.Global */
+.hl .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.hl .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.hl .il { color: #40A070 } /* Literal.Number.Integer.Long */}
+[data-theme="dark"] .hl{pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F8F8F2 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #F8F8F2 } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #F8F8F2 } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */}
+</style>
+</head>
+<body>
+<header class="topbar">
+<button class="hamburger" aria-label="打开目录">☰</button>
+<a class="brand" href="index.html">AI 项目实战<small>从零生成、验收到持续维护</small></a>
+<div class="spacer"></div>
+<div class="searchbox">
+<input type="search" placeholder="搜索教程内容…" aria-label="搜索">
+<div class="search-results"></div>
+</div>
+<button class="theme-btn" aria-label="切换主题">🌓</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目录"><div class="group">开始</div>
+<a href="index.html" data-nav="index.html">AI 项目实战：从零生成、验收到持续维护</a>
+<div class="group">第一部分 · 建立正确的 AI 开发方式</div>
+<a href="chapters/ch01-why-projects-fail.html" data-nav="chapters/ch01-why-projects-fail.html">第 1 章　AI 能生成代码，为什么项目仍然会失败</a>
+<a href="labs/lab01-disposable-prototype.html" data-nav="labs/lab01-disposable-prototype.html">实验 1：一次性原型——生成、观察、修改、丢弃</a>
+<a href="chapters/ch02-project-basics.html" data-nav="chapters/ch02-project-basics.html">第 2 章　零基础必备：看懂项目、运行项目和阅读报错</a>
+<a href="chapters/ch03-git-safety.html" data-nav="chapters/ch03-git-safety.html">第 3 章　Git：AI 开发的安全带与时间机器</a>
+<div class="group">第二部分 · 从想法到可实施规格</div>
+<a href="chapters/ch04-intent-and-acceptance.html" data-nav="chapters/ch04-intent-and-acceptance.html">第 4 章　从想法到意图：先决定不做什么</a>
+<a href="chapters/ch05-spec-driven-development.html" data-nav="chapters/ch05-spec-driven-development.html">第 5 章　规格驱动开发：把需求写成可验证契约</a>
+<a href="chapters/ch06-architecture-and-planning.html" data-nav="chapters/ch06-architecture-and-planning.html">第 6 章　最小架构、技术决策与任务拆分</a>
+<a href="labs/lab02-project-blueprint.html" data-nav="labs/lab02-project-blueprint.html">综合实验二：不写代码，完成项目蓝图</a>
+<div class="group">第三部分 · AI 生成、验证与首次交付</div>
+<a href="chapters/ch07-vertical-slice.html" data-nav="chapters/ch07-vertical-slice.html">第 7 章　纵向打通：生成第一个真正可用的版本</a>
+<a href="chapters/ch08-small-steps-and-prs.html" data-nav="chapters/ch08-small-steps-and-prs.html">第 8 章　AI 实现闭环：小任务、小 Diff、小 PR</a>
+<a href="chapters/ch09-testing-and-debugging.html" data-nav="chapters/ch09-testing-and-debugging.html">第 9 章　测试与调试：让“AI 说完成”变成可验证事实</a>
+<a href="chapters/ch10-context-engineering.html" data-nav="chapters/ch10-context-engineering.html">第 10 章　上下文工程：让 AI 在新会话中也能接手项目</a>
+<a href="chapters/ch11-ci-release-deploy.html" data-nav="chapters/ch11-ci-release-deploy.html">第 11 章　CI、发布与部署：从本地能跑到别人能用</a>
+<a href="labs/lab03-release-v1.html" data-nav="labs/lab03-release-v1.html">综合实验三：交付第一个正式版本 v1.0</a>
+<div class="group">第四部分 · 从会生成到能长期维护</div>
+<a href="chapters/ch12-issue-driven-maintenance.html" data-nav="chapters/ch12-issue-driven-maintenance.html">第 12 章　Issue 驱动维护：从问题报告到修复 PR</a>
+<a href="chapters/ch13-change-and-refactoring.html" data-nav="chapters/ch13-change-and-refactoring.html">第 13 章　需求演化与重构：修改系统，而不是重新生成系统</a>
+<a href="chapters/ch14-legacy-modernization.html" data-nav="chapters/ch14-legacy-modernization.html">第 14 章　接手旧项目：从陌生仓库到受控现代化</a>
+<a href="chapters/ch15-data-migration-recovery.html" data-nav="chapters/ch15-data-migration-recovery.html">第 15 章　数据库迁移、备份与真正的故障恢复</a>
+<a href="chapters/ch16-long-term-maintenance.html" data-nav="chapters/ch16-long-term-maintenance.html">第 16 章　长期维护系统：依赖、安全、运行观测与文档漂移</a>
+<a href="labs/lab04-evolution-v1-1.html" data-nav="labs/lab04-evolution-v1-1.html">综合实验四：完成一次完整的需求演化（v1.1）</a>
+<a href="labs/lab05-three-month-maintenance.html" data-nav="labs/lab05-three-month-maintenance.html">综合实验五：模拟项目上线三个月</a>
+<div class="group">第五部分 · 沉淀为可复用的 AI 工程能力</div>
+<a href="chapters/ch17-skill-engineering.html" data-nav="chapters/ch17-skill-engineering.html">第 17 章　Skill 工程：把有效协作流程变成项目资产</a>
+<a href="chapters/ch18-subagents-and-automation.html" data-nav="chapters/ch18-subagents-and-automation.html">第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化</a>
+<a href="chapters/ch19-platforms-and-tool-migration.html" data-nav="chapters/ch19-platforms-and-tool-migration.html">第 19 章　平台对照与工具迁移：不被某个产品绑定</a>
+<a href="chapters/ch20-capstone.html" data-nav="chapters/ch20-capstone.html">第 20 章　结业项目：完成你自己的 AI 生成与维护闭环</a>
+<div class="group">附录</div>
+<a href="appendices/A-environment.html" data-nav="appendices/A-environment.html">附录 A　开发环境与故障速查</a>
+<a href="appendices/B-command-reference.html" data-nav="appendices/B-command-reference.html">附录 B　命令速查</a>
+<a href="appendices/C-failure-catalog.html" data-nav="appendices/C-failure-catalog.html">附录 C　故障与恢复目录</a>
+<a href="appendices/D-glossary.html" data-nav="appendices/D-glossary.html">附录 D　术语表</a>
+<a href="appendices/E-sources.html" data-nav="appendices/E-sources.html">附录 E　资料来源与核验说明</a>
+<div class="group">可复制模板</div>
+<a href="templates-intro.html" data-nav="templates-intro.html">附录 F：可复制模板原文</a>
+<a href="templates/intent.html" data-nav="templates/intent.html">项目意图（Intent）</a>
+<a href="templates/spec.html" data-nav="templates/spec.html">功能规格（Spec）</a>
+<a href="templates/plan.html" data-nav="templates/plan.html">实施计划（Plan）</a>
+<a href="templates/tasks.html" data-nav="templates/tasks.html">任务列表（Tasks）</a>
+<a href="templates/adr.html" data-nav="templates/adr.html">架构决策记录（ADR-XXXX：标题）</a>
+<a href="templates/issue.html" data-nav="templates/issue.html">Issue：[类型] 一句话描述问题或需求</a>
+<a href="templates/bug-report.html" data-nav="templates/bug-report.html">Bug 报告与诊断记录</a>
+<a href="templates/pr-checklist.html" data-nav="templates/pr-checklist.html">PR 检查清单</a>
+<a href="templates/release-checklist.html" data-nav="templates/release-checklist.html">发布检查清单（Release）</a>
+<a href="templates/runbook.html" data-nav="templates/runbook.html">运行维护手册（Runbook）</a>
+<a href="templates/handoff.html" data-nav="templates/handoff.html">会话交接文档（Handoff）</a>
+<a href="templates/definition-of-done.html" data-nav="templates/definition-of-done.html">完成定义（Definition of Done）</a></nav>
+<main class="content"><article><h1 id="ai">AI 项目实战：从零生成、验收到持续维护</h1>
+<blockquote>
+<p>用一个真实项目，掌握需求、规格、编码、测试、部署、演化与 AI 工程化协作。</p>
+</blockquote>
+<p>这不是一本“提示词大全”，也不是某个 AI 产品的操作手册。你要完成的是一个可导出、可测试、可发布、可回滚、可继续接手的软件项目。</p>
+<h2 id="_1">你将学会什么</h2>
+<ul>
+<li>把模糊想法整理成意图、规格、验收场景和任务。</li>
+<li>让 AI 小步完成实现，并通过 Diff、测试和 CI 检查结果。</li>
+<li>用 Git 保留变更历史，在出错时恢复。</li>
+<li>把项目规则、架构决策和故障经验沉淀为仓库资产。</li>
+<li>修复 Bug、增加功能、接手旧项目，而不是推翻重写。</li>
+<li>处理数据库迁移、备份恢复、依赖升级和文档漂移。</li>
+<li>创建可复用 Skill，并逐步引入子 Agent 与 Issue-to-PR 自动化。</li>
+</ul>
+<h2 id="_2">贯穿项目</h2>
+<p>教程使用“个人订阅与续费管理器”，默认技术栈为 Python、FastAPI、SQLite、原生 Web 前端、pytest、Ruff 和 GitHub Actions。</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>你将完成的事情</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v0.0</td>
+<td>生成一次性原型，观察需求模糊带来的失控</td>
+</tr>
+<tr>
+<td>v0.1</td>
+<td>打通添加、查看订阅的完整流程</td>
+</tr>
+<tr>
+<td>v0.2</td>
+<td>完成修改、删除、输入校验和小 PR</td>
+</tr>
+<tr>
+<td>v1.0</td>
+<td>补齐测试、CSV 导出、CI、部署与发布</td>
+</tr>
+<tr>
+<td>v1.1</td>
+<td>修复 Bug、增加搜索筛选、局部重构、接手旧项目</td>
+</tr>
+<tr>
+<td>v1.2</td>
+<td>完成数据库迁移、备份恢复与长期维护演练</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">推荐阅读路线</h2>
+<h3 id="_4">完整路线</h3>
+<p>按章节顺序阅读，并完成每章验收与五个实验。适合第一次独立完成软件项目的读者。</p>
+<h3 id="_5">快速生成路线</h3>
+<p>第 1—9 章 → 第 11 章 → 实验三。适合想先做出并发布第一个版本的读者；之后仍需补读维护部分。</p>
+<h3 id="_6">已有项目维护路线</h3>
+<p>第 2—3 章 → 第 9—10 章 → 第 12—16 章 → 实验四、五。适合已有代码仓库的读者。</p>
+<h3 id="_7">工程自动化路线</h3>
+<p>先完成核心 16 章，再读第 17—19 章。不要从多 Agent 和自动化开始第一次项目实践。</p>
+<h2 id="ai_1">第一部分：建立正确的 AI 开发方式</h2>
+<ol>
+<li><a href="chapters/ch01-why-projects-fail.html">AI 能生成代码，为什么项目仍然会失败</a></li>
+<li><a href="chapters/ch02-project-basics.html">零基础必备：看懂项目、运行项目和阅读报错</a></li>
+<li><a href="chapters/ch03-git-safety.html">Git：AI 开发的安全带与时间机器</a></li>
+</ol>
+<ul>
+<li><a href="labs/lab01-disposable-prototype.html">综合实验一：一次性原型与失控复盘</a></li>
+</ul>
+<h2 id="_8">第二部分：从模糊想法到可实施规格</h2>
+<ol start="4">
+<li><a href="chapters/ch04-intent-and-acceptance.html">从想法到意图：先决定不做什么</a></li>
+<li><a href="chapters/ch05-spec-driven-development.html">规格驱动开发：把需求写成可验证契约</a></li>
+<li><a href="chapters/ch06-architecture-and-planning.html">最小架构、技术决策与任务拆分</a></li>
+</ol>
+<ul>
+<li><a href="labs/lab02-project-blueprint.html">综合实验二：不写代码，完成项目蓝图</a></li>
+</ul>
+<h2 id="ai_2">第三部分：AI 生成、验证与首次交付</h2>
+<ol start="7">
+<li><a href="chapters/ch07-vertical-slice.html">纵向打通：生成第一个真正可用的版本</a></li>
+<li><a href="chapters/ch08-small-steps-and-prs.html">AI 实现闭环：小任务、小 Diff、小 PR</a></li>
+<li><a href="chapters/ch09-testing-and-debugging.html">测试与调试：让“AI 说完成”变成可验证事实</a></li>
+<li><a href="chapters/ch10-context-engineering.html">上下文工程：让 AI 在新会话中也能接手项目</a></li>
+<li><a href="chapters/ch11-ci-release-deploy.html">CI、发布与部署：从本地能跑到别人能用</a></li>
+</ol>
+<ul>
+<li><a href="labs/lab03-release-v1.html">综合实验三：交付第一个正式版本</a></li>
+</ul>
+<h2 id="_9">第四部分：从会生成到能长期维护</h2>
+<ol start="12">
+<li><a href="chapters/ch12-issue-driven-maintenance.html">Issue 驱动维护：从问题报告到修复 PR</a></li>
+<li><a href="chapters/ch13-change-and-refactoring.html">需求演化与重构：修改系统，而不是重新生成系统</a></li>
+<li><a href="chapters/ch14-legacy-modernization.html">接手旧项目：从陌生仓库到受控现代化</a></li>
+<li><a href="chapters/ch15-data-migration-recovery.html">数据库迁移、备份与真正的故障恢复</a></li>
+<li><a href="chapters/ch16-long-term-maintenance.html">长期维护系统：依赖、安全、运行观测与文档漂移</a></li>
+</ol>
+<ul>
+<li><a href="labs/lab04-evolution-v1-1.html">综合实验四：完成一次完整的需求演化</a></li>
+<li><a href="labs/lab05-three-month-maintenance.html">综合实验五：模拟项目上线三个月</a></li>
+</ul>
+<h2 id="ai_3">第五部分：把经验沉淀为可复用的 AI 工程能力</h2>
+<ol start="17">
+<li><a href="chapters/ch17-skill-engineering.html">Skill 工程：把有效协作流程变成项目资产</a></li>
+<li><a href="chapters/ch18-subagents-and-automation.html">子 Agent、Hooks 与 Issue-to-PR 自动化</a></li>
+<li><a href="chapters/ch19-platforms-and-tool-migration.html">平台对照与工具迁移：不被某个产品绑定</a></li>
+<li><a href="chapters/ch20-capstone.html">结业项目：完成你自己的 AI 生成与维护闭环</a></li>
+</ol>
+<h2 id="_10">附录</h2>
+<ul>
+<li><a href="appendices/A-environment.html">附录 A：开发环境与故障速查</a></li>
+<li><a href="appendices/B-command-reference.html">附录 B：工具命令对照</a></li>
+<li><a href="appendices/C-failure-catalog.html">附录 C：失败案例库</a></li>
+<li><a href="appendices/D-glossary.html">附录 D：术语表</a></li>
+<li><a href="appendices/E-sources.html">附录 E：参考资料与来源索引</a></li>
+</ul>
+<h2 id="_11">可复制模板</h2>
+<table>
+<thead>
+<tr>
+<th>模板</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="templates/intent.html">项目意图</a></td>
+<td>明确用户、问题、范围、约束与成功标准</td>
+</tr>
+<tr>
+<td><a href="templates/spec.html">功能规格</a></td>
+<td>记录行为、规则和验收场景</td>
+</tr>
+<tr>
+<td><a href="templates/plan.html">实施计划</a></td>
+<td>记录技术方案、影响范围和验证策略</td>
+</tr>
+<tr>
+<td><a href="templates/tasks.html">任务列表</a></td>
+<td>把计划拆成可独立验证的小任务</td>
+</tr>
+<tr>
+<td><a href="templates/adr.html">架构决策记录</a></td>
+<td>保存技术选择的原因和后果</td>
+</tr>
+<tr>
+<td><a href="templates/issue.html">Issue</a></td>
+<td>描述一个可交付的问题或需求</td>
+</tr>
+<tr>
+<td><a href="templates/bug-report.html">Bug 报告</a></td>
+<td>保存复现、证据、影响与回归要求</td>
+</tr>
+<tr>
+<td><a href="templates/pr-checklist.html">PR 检查清单</a></td>
+<td>审查 Diff、测试、兼容性和交付证据</td>
+</tr>
+<tr>
+<td><a href="templates/release-checklist.html">发布检查清单</a></td>
+<td>检查构建、部署、回滚和发布记录</td>
+</tr>
+<tr>
+<td><a href="templates/runbook.html">运行维护手册</a></td>
+<td>记录启动、观测、备份和故障处理</td>
+</tr>
+<tr>
+<td><a href="templates/handoff.html">会话交接</a></td>
+<td>让新 AI 会话从项目事实继续工作</td>
+</tr>
+<tr>
+<td><a href="templates/definition-of-done.html">完成定义</a></td>
+<td>统一“完成”所需的客观证据</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_12">每章如何使用</h2>
+<ol>
+<li>先读“本章成果”和“起始项目状态”。</li>
+<li>按操作步骤完成任务，不要只复制 AI 的输出。</li>
+<li>在人工检查点阅读 Diff、文件和关键行为。</li>
+<li>执行验收命令，保存真实输出或截图。</li>
+<li>遇到失败时先按“症状—原因—恢复”处理。</li>
+<li>验收通过后，再按建议拆分 Git 提交。</li>
+</ol>
+<h2 id="_13">教程的验收原则</h2>
+<ul>
+<li>AI 说“完成”不是证据。</li>
+<li>页面能打开不等于核心流程正确。</li>
+<li>测试全绿还要检查测试是否真的断言了业务行为。</li>
+<li>代码回滚不等于数据已经恢复。</li>
+<li>平台快照不替代正式 Git 历史。</li>
+<li>项目只有在干净环境可复现、后续变化可局部实现时，才算真正可交付、可维护。</li>
+</ul>
+<h2 id="_14">写作与维护</h2>
+<p>章节结构、项目字段、命令和作者分工约定见 <a href="WRITING_GUIDE.html">写作与集成契约</a>。工具功能具有时效性，具体产品能力以官方最新文档为准；稳定的方法和验收原则不随工具界面变化而变化。</p></article><nav class="pagenav"><a class="next" href="chapters/ch01-why-projects-fail.html"><small>下一篇 →</small>第 1 章　AI 能生成代码，为什么项目仍然会失败</a></nav></main>
+</div>
+<footer>AI 项目实战 · 从零生成、验收到持续维护 · 由纯静态 HTML 生成，可部署到 Cloudflare Pages / GitHub Pages</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

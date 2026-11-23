@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 7 章　纵向打通：生成第一个真正可用的版本 · AI 项目实战</title>
+<script>(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
+</script>
+<style>:root{--bg:#faf9f7;--surface:#fff;--sidebar:#f3f2ee;--text:#1f2328;--text-2:#57606a;--border:#e4e2dc;--accent:#4f46e5;--accent-2:#7c3aed;--radius:10px;--shadow:0 1px 3px rgb(0 0 0/.08);--font-sans:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Cascadia Code",Consolas,"JetBrains Mono",monospace}
+[data-theme="dark"]{--bg:#101014;--surface:#18181f;--sidebar:#14141a;--text:#e6e6ea;--text-2:#9a9aa5;--border:#2a2a33;--accent:#818cf8;--accent-2:#a78bfa;--shadow:0 1px 3px rgb(0 0 0/.4)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 var(--font-sans)}
+a{color:var(--accent);text-decoration:none;transition:.15s ease}a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 20px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topbar .brand{font-weight:700;font-size:1.05rem;color:var(--text);white-space:nowrap}
+.topbar .brand small{color:var(--text-2);font-weight:400;margin-left:8px}
+.topbar .spacer{flex:1}
+.searchbox{position:relative;width:min(320px,40vw)}
+.searchbox input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:inherit}
+.searchbox input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.search-results{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);max-height:340px;overflow:auto;display:none}
+.search-results a{display:block;padding:8px 14px;color:var(--text);border-bottom:1px solid var(--border)}
+.search-results a:last-child{border-bottom:0}
+.search-results a b{color:var(--accent)}
+.search-results a small{display:block;color:var(--text-2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-empty{padding:10px 14px;color:var(--text-2);font-size:.9rem}
+.theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit}
+.theme-btn:hover{border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;align-items:start}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;padding:18px 14px 40px;background:var(--sidebar);border-right:1px solid var(--border)}
+.sidebar .group{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin:18px 10px 6px;font-weight:600}
+.sidebar a{display:block;padding:6px 10px;border-radius:8px;color:var(--text);font-size:.92rem;line-height:1.5;border-left:3px solid transparent;margin:1px 0}
+.sidebar a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);text-decoration:none}
+.sidebar a.active{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.content{padding:36px 32px 80px;min-width:0}
+article{max-width:76ch;margin:0 auto;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+article h1{font-size:1.9rem;line-height:1.35;margin:0 0 .8em}
+article h2{font-size:1.4rem;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--border)}
+article h3{font-size:1.15rem;margin:1.6em 0 .5em}
+article h4{font-size:1rem;margin:1.4em 0 .4em}
+article p{text-align:justify;margin:.9em 0}
+article ul,article ol{padding-left:1.6em;margin:.8em 0}
+article li{margin:.35em 0}
+article blockquote{margin:1.2em 0;padding:.8em 1.1em;background:var(--surface);border-left:3px solid var(--accent);border-radius:var(--radius);color:var(--text-2)}
+article blockquote p{margin:.3em 0;text-align:left}
+article hr{border:0;border-top:1px solid var(--border);margin:2em 0}
+article img{max-width:100%;border-radius:var(--radius)}
+code{font-family:var(--font-mono);font-size:.9em;background:color-mix(in srgb,var(--accent) 10%,transparent);padding:.15em .4em;border-radius:5px}
+pre{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1em 1.1em;overflow:auto;font-size:.88rem;line-height:1.6;margin:1.1em 0}
+pre code{background:none;padding:0}
+.code-wrap{position:relative;margin:1.1em 0}
+.code-wrap pre{margin:0}
+.copy-btn{position:absolute;top:8px;right:8px;z-index:2;border:1px solid var(--border);background:var(--bg);color:var(--text-2);border-radius:6px;padding:3px 9px;font-size:.75rem;cursor:pointer;opacity:0;transition:.15s ease;font-family:var(--font-sans)}
+.code-wrap:hover .copy-btn{opacity:1}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:#16a34a;border-color:#16a34a;opacity:1}
+.tbl-wrap{overflow:auto;margin:1.2em 0}
+article table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface);border-radius:var(--radius)}
+article th{background:var(--sidebar);font-weight:600;text-align:left}
+article th,article td{border:1px solid var(--border);padding:.5em .75em}
+article tbody tr:nth-child(even){background:color-mix(in srgb,var(--sidebar) 55%,transparent)}
+.pagenav{display:flex;justify-content:space-between;gap:12px;margin-top:3em;padding-top:1.2em;border-top:1px solid var(--border)}
+.pagenav a{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:46%}
+.pagenav a small{display:block;color:var(--text-2);font-size:.78rem}
+.pagenav a.next{text-align:right;margin-left:auto}
+footer{padding:26px 20px;color:var(--text-2);font-size:.85rem;text-align:center;border-top:1px solid var(--border)}
+.hamburger{display:none;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;color:var(--text)}
+@media (max-width:900px){
+.layout{display:block}
+.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;width:280px;transform:translateX(-100%);transition:transform .2s ease;height:100vh;border-right:1px solid var(--border)}
+.sidebar.open{transform:none;box-shadow:0 0 40px rgb(0 0 0/.25)}
+.hamburger{display:inline-block}
+.content{padding:24px 18px 60px}
+.searchbox{width:min(200px,38vw)}
+}
+@media print{.topbar,.sidebar,.pagenav,.copy-btn{display:none!important}.layout{display:block}.content{padding:0}.article,article{max-width:none}}
+.hl{background:transparent}
+:root:not([data-theme="dark"]) .hl{pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #ffffcc }
+.hl { background: #f0f0f0; }
+.hl .c { color: #60A0B0; font-style: italic } /* Comment */
+.hl .err { border: 1px solid #F00 } /* Error */
+.hl .k { color: #007020; font-weight: bold } /* Keyword */
+.hl .o { color: #666 } /* Operator */
+.hl .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.hl .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.hl .cp { color: #007020 } /* Comment.Preproc */
+.hl .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.hl .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.hl .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.hl .gd { color: #A00000 } /* Generic.Deleted */
+.hl .ge { font-style: italic } /* Generic.Emph */
+.hl .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F00 } /* Generic.Error */
+.hl .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.hl .gi { color: #00A000 } /* Generic.Inserted */
+.hl .go { color: #888 } /* Generic.Output */
+.hl .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.hl .gs { font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.hl .gt { color: #04D } /* Generic.Traceback */
+.hl .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.hl .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.hl .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.hl .kp { color: #007020 } /* Keyword.Pseudo */
+.hl .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.hl .kt { color: #902000 } /* Keyword.Type */
+.hl .m { color: #40A070 } /* Literal.Number */
+.hl .s { color: #4070A0 } /* Literal.String */
+.hl .na { color: #4070A0 } /* Name.Attribute */
+.hl .nb { color: #007020 } /* Name.Builtin */
+.hl .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.hl .no { color: #60ADD5 } /* Name.Constant */
+.hl .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.hl .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.hl .ne { color: #007020 } /* Name.Exception */
+.hl .nf { color: #06287E } /* Name.Function */
+.hl .nl { color: #002070; font-weight: bold } /* Name.Label */
+.hl .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.hl .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.hl .nv { color: #BB60D5 } /* Name.Variable */
+.hl .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.hl .w { color: #BBB } /* Text.Whitespace */
+.hl .mb { color: #40A070 } /* Literal.Number.Bin */
+.hl .mf { color: #40A070 } /* Literal.Number.Float */
+.hl .mh { color: #40A070 } /* Literal.Number.Hex */
+.hl .mi { color: #40A070 } /* Literal.Number.Integer */
+.hl .mo { color: #40A070 } /* Literal.Number.Oct */
+.hl .sa { color: #4070A0 } /* Literal.String.Affix */
+.hl .sb { color: #4070A0 } /* Literal.String.Backtick */
+.hl .sc { color: #4070A0 } /* Literal.String.Char */
+.hl .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.hl .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.hl .s2 { color: #4070A0 } /* Literal.String.Double */
+.hl .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.hl .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.hl .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.hl .sx { color: #C65D09 } /* Literal.String.Other */
+.hl .sr { color: #235388 } /* Literal.String.Regex */
+.hl .s1 { color: #4070A0 } /* Literal.String.Single */
+.hl .ss { color: #517918 } /* Literal.String.Symbol */
+.hl .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #06287E } /* Name.Function.Magic */
+.hl .vc { color: #BB60D5 } /* Name.Variable.Class */
+.hl .vg { color: #BB60D5 } /* Name.Variable.Global */
+.hl .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.hl .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.hl .il { color: #40A070 } /* Literal.Number.Integer.Long */}
+[data-theme="dark"] .hl{pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F8F8F2 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #F8F8F2 } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #F8F8F2 } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */}
+</style>
+</head>
+<body>
+<header class="topbar">
+<button class="hamburger" aria-label="打开目录">☰</button>
+<a class="brand" href="index.html">AI 项目实战<small>从零生成、验收到持续维护</small></a>
+<div class="spacer"></div>
+<div class="searchbox">
+<input type="search" placeholder="搜索教程内容…" aria-label="搜索">
+<div class="search-results"></div>
+</div>
+<button class="theme-btn" aria-label="切换主题">🌓</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目录"><div class="group">开始</div>
+<a href="index.html" data-nav="index.html">AI 项目实战：从零生成、验收到持续维护</a>
+<div class="group">第一部分 · 建立正确的 AI 开发方式</div>
+<a href="chapters/ch01-why-projects-fail.html" data-nav="chapters/ch01-why-projects-fail.html">第 1 章　AI 能生成代码，为什么项目仍然会失败</a>
+<a href="labs/lab01-disposable-prototype.html" data-nav="labs/lab01-disposable-prototype.html">实验 1：一次性原型——生成、观察、修改、丢弃</a>
+<a href="chapters/ch02-project-basics.html" data-nav="chapters/ch02-project-basics.html">第 2 章　零基础必备：看懂项目、运行项目和阅读报错</a>
+<a href="chapters/ch03-git-safety.html" data-nav="chapters/ch03-git-safety.html">第 3 章　Git：AI 开发的安全带与时间机器</a>
+<div class="group">第二部分 · 从想法到可实施规格</div>
+<a href="chapters/ch04-intent-and-acceptance.html" data-nav="chapters/ch04-intent-and-acceptance.html">第 4 章　从想法到意图：先决定不做什么</a>
+<a href="chapters/ch05-spec-driven-development.html" data-nav="chapters/ch05-spec-driven-development.html">第 5 章　规格驱动开发：把需求写成可验证契约</a>
+<a href="chapters/ch06-architecture-and-planning.html" data-nav="chapters/ch06-architecture-and-planning.html">第 6 章　最小架构、技术决策与任务拆分</a>
+<a href="labs/lab02-project-blueprint.html" data-nav="labs/lab02-project-blueprint.html">综合实验二：不写代码，完成项目蓝图</a>
+<div class="group">第三部分 · AI 生成、验证与首次交付</div>
+<a href="chapters/ch07-vertical-slice.html" data-nav="chapters/ch07-vertical-slice.html">第 7 章　纵向打通：生成第一个真正可用的版本</a>
+<a href="chapters/ch08-small-steps-and-prs.html" data-nav="chapters/ch08-small-steps-and-prs.html">第 8 章　AI 实现闭环：小任务、小 Diff、小 PR</a>
+<a href="chapters/ch09-testing-and-debugging.html" data-nav="chapters/ch09-testing-and-debugging.html">第 9 章　测试与调试：让“AI 说完成”变成可验证事实</a>
+<a href="chapters/ch10-context-engineering.html" data-nav="chapters/ch10-context-engineering.html">第 10 章　上下文工程：让 AI 在新会话中也能接手项目</a>
+<a href="chapters/ch11-ci-release-deploy.html" data-nav="chapters/ch11-ci-release-deploy.html">第 11 章　CI、发布与部署：从本地能跑到别人能用</a>
+<a href="labs/lab03-release-v1.html" data-nav="labs/lab03-release-v1.html">综合实验三：交付第一个正式版本 v1.0</a>
+<div class="group">第四部分 · 从会生成到能长期维护</div>
+<a href="chapters/ch12-issue-driven-maintenance.html" data-nav="chapters/ch12-issue-driven-maintenance.html">第 12 章　Issue 驱动维护：从问题报告到修复 PR</a>
+<a href="chapters/ch13-change-and-refactoring.html" data-nav="chapters/ch13-change-and-refactoring.html">第 13 章　需求演化与重构：修改系统，而不是重新生成系统</a>
+<a href="chapters/ch14-legacy-modernization.html" data-nav="chapters/ch14-legacy-modernization.html">第 14 章　接手旧项目：从陌生仓库到受控现代化</a>
+<a href="chapters/ch15-data-migration-recovery.html" data-nav="chapters/ch15-data-migration-recovery.html">第 15 章　数据库迁移、备份与真正的故障恢复</a>
+<a href="chapters/ch16-long-term-maintenance.html" data-nav="chapters/ch16-long-term-maintenance.html">第 16 章　长期维护系统：依赖、安全、运行观测与文档漂移</a>
+<a href="labs/lab04-evolution-v1-1.html" data-nav="labs/lab04-evolution-v1-1.html">综合实验四：完成一次完整的需求演化（v1.1）</a>
+<a href="labs/lab05-three-month-maintenance.html" data-nav="labs/lab05-three-month-maintenance.html">综合实验五：模拟项目上线三个月</a>
+<div class="group">第五部分 · 沉淀为可复用的 AI 工程能力</div>
+<a href="chapters/ch17-skill-engineering.html" data-nav="chapters/ch17-skill-engineering.html">第 17 章　Skill 工程：把有效协作流程变成项目资产</a>
+<a href="chapters/ch18-subagents-and-automation.html" data-nav="chapters/ch18-subagents-and-automation.html">第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化</a>
+<a href="chapters/ch19-platforms-and-tool-migration.html" data-nav="chapters/ch19-platforms-and-tool-migration.html">第 19 章　平台对照与工具迁移：不被某个产品绑定</a>
+<a href="chapters/ch20-capstone.html" data-nav="chapters/ch20-capstone.html">第 20 章　结业项目：完成你自己的 AI 生成与维护闭环</a>
+<div class="group">附录</div>
+<a href="appendices/A-environment.html" data-nav="appendices/A-environment.html">附录 A　开发环境与故障速查</a>
+<a href="appendices/B-command-reference.html" data-nav="appendices/B-command-reference.html">附录 B　命令速查</a>
+<a href="appendices/C-failure-catalog.html" data-nav="appendices/C-failure-catalog.html">附录 C　故障与恢复目录</a>
+<a href="appendices/D-glossary.html" data-nav="appendices/D-glossary.html">附录 D　术语表</a>
+<a href="appendices/E-sources.html" data-nav="appendices/E-sources.html">附录 E　资料来源与核验说明</a>
+<div class="group">可复制模板</div>
+<a href="templates-intro.html" data-nav="templates-intro.html">附录 F：可复制模板原文</a>
+<a href="templates/intent.html" data-nav="templates/intent.html">项目意图（Intent）</a>
+<a href="templates/spec.html" data-nav="templates/spec.html">功能规格（Spec）</a>
+<a href="templates/plan.html" data-nav="templates/plan.html">实施计划（Plan）</a>
+<a href="templates/tasks.html" data-nav="templates/tasks.html">任务列表（Tasks）</a>
+<a href="templates/adr.html" data-nav="templates/adr.html">架构决策记录（ADR-XXXX：标题）</a>
+<a href="templates/issue.html" data-nav="templates/issue.html">Issue：[类型] 一句话描述问题或需求</a>
+<a href="templates/bug-report.html" data-nav="templates/bug-report.html">Bug 报告与诊断记录</a>
+<a href="templates/pr-checklist.html" data-nav="templates/pr-checklist.html">PR 检查清单</a>
+<a href="templates/release-checklist.html" data-nav="templates/release-checklist.html">发布检查清单（Release）</a>
+<a href="templates/runbook.html" data-nav="templates/runbook.html">运行维护手册（Runbook）</a>
+<a href="templates/handoff.html" data-nav="templates/handoff.html">会话交接文档（Handoff）</a>
+<a href="templates/definition-of-done.html" data-nav="templates/definition-of-done.html">完成定义（Definition of Done）</a></nav>
+<main class="content"><article><h1 id="7">第 7 章　纵向打通：生成第一个真正可用的版本</h1>
+<blockquote>
+<p>本章成果：让读者完成 Subscription Tracker 的第一个可用纵向切片，从浏览器表单到 FastAPI 接口再到 SQLite 数据表，保存并查看一条订阅记录。</p>
+</blockquote>
+<h2 id="1">1. 本章成果</h2>
+<p>完成本章后，项目应当具备：</p>
+<ul>
+<li>一个可启动的 FastAPI 应用，并暴露 <code>/health</code> 健康检查。</li>
+<li>一个 SQLite 数据表，能够持久保存订阅记录。</li>
+<li>两个核心 API：</li>
+<li><code>GET /api/subscriptions</code>：列出全部订阅。</li>
+<li><code>POST /api/subscriptions</code>：创建一条订阅。</li>
+<li>一个最小网页：填写表单、提交数据、显示已有订阅。</li>
+<li>一条端到端证据：浏览器刷新后，刚才创建的订阅仍然存在。</li>
+</ul>
+<p>对应版本为 <strong>v0.1</strong>。它不追求漂亮界面，也不实现修改、删除、导入导出、提醒或用户登录。本章只证明一件事：</p>
+<blockquote>
+<p>用户操作、HTTP 请求、后端校验、数据持久化和页面展示能够真正连通。</p>
+</blockquote>
+<p>如果这条“纵向切片”不成立，后续所有功能都只是叠在不可靠地基上的演示。</p>
+<h2 id="2">2. 为什么需要它</h2>
+<p>很多 AI 生成的项目看起来一次性完成了很多页面和模块，但存在一个共同问题：每一块都可以局部运行，整体却无法可靠串起来。典型表现包括：</p>
+<ul>
+<li>页面能显示，但数据没有真正写入数据库。</li>
+<li>API 能返回固定示例数据，但没有经过校验。</li>
+<li>后端能创建数据，但刷新页面后前端看不到。</li>
+<li>项目能运行，却没有人知道启动命令、数据库位置或失败原因。</li>
+<li>AI 一次生成大量文件，读者无法判断哪些代码与当前需求有关。</li>
+</ul>
+<p>纵向切片的目的，是先用最小功能打通真实路径：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>浏览器表单
+→ fetch 请求
+→ FastAPI 路由
+→ Pydantic 校验
+→ SQLite 写入
+→ GET 查询
+→ 前端渲染
+</code></pre></div></div>
+
+<p>这条链路一旦可运行、可检查，后续增加修改、删除、搜索、测试和部署时，才有稳定的反馈边界。</p>
+<h2 id="3">3. 最少必备知识</h2>
+<p>不需要先系统学完 Python、HTTP 或数据库，但要理解本章使用的几个概念：</p>
+<ul>
+<li><strong>HTTP 请求与响应</strong>：浏览器通过 <code>GET</code> 获取数据，通过 <code>POST</code> 提交数据。</li>
+<li><strong>JSON</strong>：前后端交换的数据格式，例如 <code>{"name": "Music", "amount": 1500}</code>。</li>
+<li><strong>API 路由</strong>：后端暴露的固定地址，例如 <code>/api/subscriptions</code>。</li>
+<li><strong>数据库表</strong>：SQLite 中的 <code>subscriptions</code> 表负责持久保存记录。</li>
+<li><strong>静态文件</strong>：<code>index.html</code>、<code>app.js</code> 和 <code>styles.css</code> 由 FastAPI 提供给浏览器。</li>
+<li><strong>金额单位</strong>：为了避免浮点误差，本项目 <code>amount</code> 字段统一使用<strong>分</strong>为单位的正整数。<code>1500</code> 表示 <code>15.00</code> 元。</li>
+</ul>
+<p>如果某个概念暂时不清楚，可以先照步骤完成任务，再回到本节和报错信息建立理解。</p>
+<h2 id="4">4. 起始项目状态</h2>
+<p>开始本章前，应当已经完成意图、规格、架构和任务拆分，仓库中至少存在这些内容：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>subscription-tracker/
+├─ docs/
+│  ├─ intent.md
+│  ├─ acceptance.md
+│  ├─ plan.md
+│  └─ tasks.md
+├─ specs/
+├─ AGENTS.md
+├─ ARCHITECTURE.md
+├─ README.md
+└─ requirements.txt
+</code></pre></div></div>
+
+<p><code>requirements.txt</code> 可以先写入：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>fastapi
+pydantic
+uvicorn[standard]
+pytest
+httpx
+ruff
+</code></pre></div></div>
+
+<p>然后创建并激活虚拟环境：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">venv</span>
+<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div></div>
+
+<p>macOS 或 Linux 使用：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</code></pre></div></div>
+
+<p>本章结束时，项目将扩展为：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>subscription-tracker/
+├─ app/
+│  ├─ __init__.py
+│  ├─ database.py
+│  ├─ main.py
+│  ├─ repository.py
+│  ├─ routes.py
+│  ├─ schemas.py
+│  └─ static/
+│     ├─ app.js
+│     ├─ index.html
+│     └─ styles.css
+└─ requirements.txt
+</code></pre></div></div>
+
+<p><code>tests/</code> 暂不在本章创建，后续测试章节会加入。</p>
+<h2 id="5-ai">5. 操作步骤与 AI 任务示例</h2>
+<h3 id="51">5.1 定义本章的唯一任务</h3>
+<p>不要把“生成整个项目”直接交给 AI。当前任务只有一条：</p>
+<blockquote>
+<p>实现一个可以添加并查看订阅记录的纵向切片。</p>
+</blockquote>
+<p>建议把它写入 <code>docs/tasks.md</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gu">### T-07 纵向切片：添加并查看订阅</span>
+
+目标：用户可以通过网页添加一条订阅，并在刷新后看到这条订阅。
+
+范围：
+<span class="k">-</span><span class="w"> </span><span class="sb">`GET /api/subscriptions`</span>
+<span class="k">-</span><span class="w"> </span><span class="sb">`POST /api/subscriptions`</span>
+<span class="k">-</span><span class="w"> </span><span class="sb">`/health`</span>
+<span class="k">-</span><span class="w"> </span>最小表单和列表
+
+不做：
+<span class="k">-</span><span class="w"> </span>修改、删除、搜索、导出
+<span class="k">-</span><span class="w"> </span>用户登录和提醒
+<span class="k">-</span><span class="w"> </span>数据库迁移工具
+<span class="k">-</span><span class="w"> </span>额外前端框架
+
+完成标准：
+<span class="k">-</span><span class="w"> </span>新记录能保存到 SQLite。
+<span class="k">-</span><span class="w"> </span>页面刷新后仍显示该记录。
+<span class="k">-</span><span class="w"> </span>非法金额返回 422。
+<span class="k">-</span><span class="w"> </span>服务日志没有未处理异常。
+</code></pre></div></div>
+
+<h3 id="52-ai">5.2 给 AI 的任务示例</h3>
+<p>可以直接使用下面这个任务，也可以换成自己的编码 Agent：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：
+为 Subscription Tracker 实现 v0.1 纵向切片，让浏览器表单可以通过 FastAPI 将一条订阅记录保存到 SQLite，并能列出全部记录。
+
+上下文：
+- 当前仓库已有 docs/、specs/、AGENTS.md、ARCHITECTURE.md 和 requirements.txt。
+- Python 版本为 3.12+。
+- 后端使用 FastAPI，数据访问使用 Python 标准库 sqlite3，不引入 ORM。
+- 前端只使用原生 HTML、CSS 和 JavaScript。
+- 数据库文件路径通过环境变量 DATABASE_PATH 配置，默认为项目根目录下的 subscriptions.db。
+- 订阅字段为 id、name、amount、currency、renewal_date、note、created_at。
+- amount 必须是以分为单位的正整数。
+- renewal_date 使用 ISO 日期格式 YYYY-MM-DD。
+
+范围：
+只能创建或修改以下文件：
+- requirements.txt
+- app/__init__.py
+- app/database.py
+- app/schemas.py
+- app/repository.py
+- app/routes.py
+- app/main.py
+- app/static/index.html
+- app/static/app.js
+- app/static/styles.css
+
+约束：
+- 不创建测试文件。
+- 不实现修改、删除、搜索、导入导出、提醒或认证。
+- 不引入数据库迁移工具、ORM、前端框架、Tailwind、Node.js 构建流程或其他新依赖。
+- SQL 必须使用参数绑定，禁止把用户输入拼接进 SQL 字符串。
+- Pydantic 模型必须拒绝空名称、非正整数金额和错误的货币代码。
+- created_at 由后端生成 UTC ISO 时间，不能接受客户端传入。
+- 前端渲染订阅时必须使用 textContent 或 createElement，不能使用 innerHTML 拼接用户数据。
+- /health 必须在静态文件挂载之前注册，避免被根路径静态服务遮蔽。
+- 所有 API 路径使用 /api/subscriptions。
+
+验收：
+1. 运行 python -m uvicorn app.main:app --reload 后，访问 http://127.0.0.1:8000 可以看到表单。
+2. 提交 name=Music、amount=1500、currency=CNY、renewal_date=2026-12-01 后，页面列表显示该记录。
+3. 刷新页面，记录仍然存在。
+4. GET /health 返回 {&quot;status&quot;:&quot;ok&quot;}。
+5. POST amount=0 返回 422。
+6. python -m ruff check . 通过。
+7. 服务日志中没有未处理异常。
+
+输出：
+- 按文件列出完整修改内容。
+- 不要输出与任务无关的文档。
+- 如果某个验收条件无法满足，先说明阻塞原因，不要伪造完成。
+</code></pre></div></div>
+
+<h3 id="53">5.3 创建数据访问层</h3>
+<p>新建空文件 <code>app/__init__.py</code>，然后创建 <code>app/database.py</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="n">database_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;打开一个 SQLite 连接。</span>
+
+<span class="sd">    默认路径来自环境变量 DATABASE_PATH；测试时可以直接传入临时数据库路径。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">database_path</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DATABASE_PATH&quot;</span><span class="p">,</span> <span class="s2">&quot;subscriptions.db&quot;</span><span class="p">))</span>
+    <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">connection</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>
+    <span class="k">return</span> <span class="n">connection</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">init_db</span><span class="p">(</span><span class="n">database_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;创建订阅表。&quot;&quot;&quot;</span>
+    <span class="n">connection</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            CREATE TABLE IF NOT EXISTS subscriptions (</span>
+<span class="sd">                id INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="sd">                name TEXT NOT NULL,</span>
+<span class="sd">                amount INTEGER NOT NULL CHECK (amount &gt; 0),</span>
+<span class="sd">                currency TEXT NOT NULL DEFAULT &#39;CNY&#39;,</span>
+<span class="sd">                renewal_date TEXT NOT NULL,</span>
+<span class="sd">                note TEXT NOT NULL DEFAULT &#39;&#39;,</span>
+<span class="sd">                created_at TEXT NOT NULL</span>
+<span class="sd">            )</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_db</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;FastAPI 依赖项：为一次请求提供数据库连接，并在请求结束后关闭。&quot;&quot;&quot;</span>
+    <span class="n">connection</span> <span class="o">=</span> <span class="n">connect</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">connection</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>这里有两个关键点：</p>
+<ol>
+<li><code>connect()</code> 每次读取 <code>DATABASE_PATH</code>，因此测试和生产可以使用不同数据库。</li>
+<li><code>get_db()</code> 的 <code>finally</code> 分支负责关闭连接，避免请求结束后连接泄漏。</li>
+</ol>
+<h3 id="54">5.4 定义请求与响应模型</h3>
+<p>创建 <code>app/schemas.py</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SubscriptionBase</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">amount</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;金额，单位为分&quot;</span><span class="p">)</span>
+    <span class="n">currency</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">renewal_date</span><span class="p">:</span> <span class="n">date</span>
+    <span class="n">note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;currency&quot;</span><span class="p">,</span> <span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">strip_text</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name cannot be empty&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;currency&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize_currency</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">normalized</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">normalized</span><span class="o">.</span><span class="n">isascii</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;currency must be an ASCII code&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">normalized</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SubscriptionCreate</span><span class="p">(</span><span class="n">SubscriptionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;创建订阅时客户端可以提供的字段。&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Subscription</span><span class="p">(</span><span class="n">SubscriptionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;返回给客户端的完整订阅记录。&quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+</code></pre></div></div>
+
+<p>这些模型承担第一道校验：</p>
+<ul>
+<li><code>name</code> 去除首尾空格后不能为空。</li>
+<li><code>amount</code> 必须是大于 <code>0</code> 的整数。</li>
+<li><code>currency</code> 统一转为大写，例如 <code>cny</code> 会变成 <code>CNY</code>。</li>
+<li><code>renewal_date</code> 必须能解析为日期。</li>
+<li><code>id</code> 和 <code>created_at</code> 只能由后端产生，客户端无法通过 <code>SubscriptionCreate</code> 伪造。</li>
+</ul>
+<h3 id="55">5.5 实现仓库层</h3>
+<p>创建 <code>app/repository.py</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubscriptionCreate</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_now_utc</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_subscription</span><span class="p">(</span><span class="n">connection</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span> <span class="n">subscription_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">&quot;SELECT * FROM subscriptions WHERE id = ?&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">subscription_id</span><span class="p">,),</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">list_subscriptions</span><span class="p">(</span><span class="n">connection</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="s2">&quot;SELECT * FROM subscriptions ORDER BY renewal_date, id&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_subscription</span><span class="p">(</span>
+    <span class="n">connection</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span><span class="p">,</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="n">SubscriptionCreate</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_now_utc</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">connection</span><span class="p">:</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            INSERT INTO subscriptions (</span>
+<span class="sd">                name, amount, currency, renewal_date, note, created_at</span>
+<span class="sd">            ) VALUES (</span>
+<span class="sd">                :name, :amount, :currency, :renewal_date, :note, :created_at</span>
+<span class="sd">            )</span>
+<span class="sd">            &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">created</span> <span class="o">=</span> <span class="n">get_subscription</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">lastrowid</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">created</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;subscription was created but could not be read back&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">created</span>
+</code></pre></div></div>
+
+<p>注意：</p>
+<ul>
+<li><code>payload.model_dump(mode="json")</code> 会把 <code>date</code> 转成 ISO 字符串，适合直接存入 SQLite。</li>
+<li><code>with connection:</code> 表示 SQL 成功时提交，异常时回滚。</li>
+<li><code>get_subscription()</code> 在本章只被创建逻辑复用，但它也为后续按 ID 查询打好基础。</li>
+</ul>
+<h3 id="56-api">5.6 暴露 API</h3>
+<p>创建 <code>app/routes.py</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">status</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">repository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Subscription</span><span class="p">,</span> <span class="n">SubscriptionCreate</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;/api/subscriptions&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;subscriptions&quot;</span><span class="p">])</span>
+
+
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">list</span><span class="p">[</span><span class="n">Subscription</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_subscriptions_route</span><span class="p">(</span>
+    <span class="n">connection</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">repository</span><span class="o">.</span><span class="n">list_subscriptions</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+
+
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">Subscription</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_subscription_route</span><span class="p">(</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="n">SubscriptionCreate</span><span class="p">,</span>
+    <span class="n">connection</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">repository</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>两个路由都使用空路径 <code>""</code>，配合前缀后实际地址是 <code>/api/subscriptions</code>。</p>
+<h3 id="57">5.7 创建应用入口</h3>
+<p>创建 <code>app/main.py</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.staticfiles</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticFiles</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.routes</span><span class="w"> </span><span class="kn">import</span> <span class="n">router</span>
+
+<span class="n">STATIC_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;static&quot;</span>
+
+
+<span class="nd">@asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">lifespan</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">):</span>
+    <span class="n">init_db</span><span class="p">()</span>
+    <span class="k">yield</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Subscription Tracker&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="n">lifespan</span><span class="o">=</span><span class="n">lifespan</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/health&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">}</span>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">router</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">StaticFiles</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="n">STATIC_DIR</span><span class="p">,</span> <span class="n">html</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code>/health</code> 必须先注册，再挂载根路径静态文件，否则访问 <code>/health</code> 时可能被静态文件处理器拦截。</p>
+<h3 id="58">5.8 创建最小前端</h3>
+<p>创建 <code>app/static/index.html</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;zh-CN&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;utf-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;width=device-width, initial-scale=1&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>个人订阅管理器<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;styles.css&quot;</span> <span class="p">/&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>个人订阅管理器<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;status&quot;</span> <span class="na">role</span><span class="o">=</span><span class="s">&quot;status&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+      <span class="p">&lt;</span><span class="nt">form</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;subscription-form&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+          名称
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;name&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;name&quot;</span> <span class="na">maxlength</span><span class="o">=</span><span class="s">&quot;100&quot;</span> <span class="na">required</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+          金额（分）
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;amount&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;amount&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;number&quot;</span> <span class="na">min</span><span class="o">=</span><span class="s">&quot;1&quot;</span> <span class="na">step</span><span class="o">=</span><span class="s">&quot;1&quot;</span> <span class="na">required</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+          货币
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;currency&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;currency&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;CNY&quot;</span> <span class="na">maxlength</span><span class="o">=</span><span class="s">&quot;3&quot;</span> <span class="na">required</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+          续费日期
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;renewal_date&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;renewal_date&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;date&quot;</span> <span class="na">required</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+          备注
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;note&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;note&quot;</span> <span class="na">maxlength</span><span class="o">=</span><span class="s">&quot;500&quot;</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>添加订阅<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+
+      <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>现有订阅<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">ul</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;subscription-list&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;app.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div></div>
+
+<p>创建 <code>app/static/app.js</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">form</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;subscription-form&quot;</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;subscription-list&quot;</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">statusElement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">);</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">apiUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/api/subscriptions&quot;</span><span class="p">;</span>
+
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">request</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusText</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">detail</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">undefined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">detail</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// 响应不是 JSON 时，保留默认 HTTP 状态信息。</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">204</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">render</span><span class="p">(</span><span class="nx">subscriptions</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">list</span><span class="p">.</span><span class="nx">replaceChildren</span><span class="p">();</span>
+
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">item</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">subscriptions</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">&quot;li&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">item</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">：</span><span class="si">${</span><span class="nx">item</span><span class="p">.</span><span class="nx">amount</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">item</span><span class="p">.</span><span class="nx">currency</span><span class="si">}</span><span class="sb">，</span><span class="si">${</span><span class="nx">item</span><span class="p">.</span><span class="nx">renewal_date</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">note</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">text</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="sb">`（</span><span class="si">${</span><span class="nx">item</span><span class="p">.</span><span class="nx">note</span><span class="si">}</span><span class="sb">）`</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">entry</span><span class="p">.</span><span class="nx">textContent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">text</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">list</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">entry</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">showMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="nx">isError</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">statusElement</span><span class="p">.</span><span class="nx">textContent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">message</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">statusElement</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">isError</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">refresh</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">subscriptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">(</span><span class="nx">apiUrl</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">render</span><span class="p">(</span><span class="nx">subscriptions</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">form</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;submit&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">form</span><span class="p">.</span><span class="nx">amount</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nb">Number</span><span class="p">.</span><span class="nx">isInteger</span><span class="p">(</span><span class="nx">amount</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">amount</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">showMessage</span><span class="p">(</span><span class="s2">&quot;金额必须是正整数，单位为分&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">(),</span>
+<span class="w">    </span><span class="nx">amount</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">currency</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">().</span><span class="nx">toUpperCase</span><span class="p">(),</span>
+<span class="w">    </span><span class="nx">renewal_date</span><span class="o">:</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">renewal_date</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">note</span><span class="o">:</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">note</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">(),</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">(</span><span class="nx">apiUrl</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;application/json&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">payload</span><span class="p">),</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">    </span><span class="nx">form</span><span class="p">.</span><span class="nx">reset</span><span class="p">();</span>
+<span class="w">    </span><span class="nx">form</span><span class="p">.</span><span class="nx">currency</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;CNY&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="nx">showMessage</span><span class="p">(</span><span class="s2">&quot;订阅已添加&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">refresh</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">showMessage</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">refresh</span><span class="p">().</span><span class="k">catch</span><span class="p">((</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">showMessage</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>创建 <code>app/static/styles.css</code>，先保证基本可读即可：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="nt">body</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="n">system-ui</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="kt">rem</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
+<span class="w">  </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">form</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="k">grid</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.75</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">label</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="k">grid</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">#</span><span class="nn">status</span><span class="p">.</span><span class="nc">error</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#b00020</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="59">5.9 启动并验证</h3>
+<p>在项目根目录运行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">uvicorn</span> <span class="n">app</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</code></pre></div></div>
+
+<p>浏览器访问：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>http://127.0.0.1:8000
+</code></pre></div></div>
+
+<p>填写：</p>
+<ul>
+<li>名称：<code>Music</code></li>
+<li>金额（分）：<code>1500</code></li>
+<li>货币：<code>CNY</code></li>
+<li>续费日期：未来某个日期</li>
+<li>备注：<code>vertical slice</code></li>
+</ul>
+<p>提交后，列表应显示这条记录；刷新页面，记录仍然存在。</p>
+<p>也可以用 PowerShell 直接验证 API：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="nv">$body</span> <span class="p">=</span> <span class="p">@{</span>
+  <span class="n">name</span> <span class="p">=</span> <span class="s2">&quot;Music&quot;</span>
+  <span class="n">amount</span> <span class="p">=</span> <span class="n">1500</span>
+  <span class="n">currency</span> <span class="p">=</span> <span class="s2">&quot;CNY&quot;</span>
+  <span class="n">renewal_date</span> <span class="p">=</span> <span class="s2">&quot;2026-12-01&quot;</span>
+  <span class="n">note</span> <span class="p">=</span> <span class="s2">&quot;created by api&quot;</span>
+<span class="p">}</span> <span class="p">|</span> <span class="nb">ConvertTo-Json</span>
+
+<span class="nb">Invoke-RestMethod</span> <span class="n">-Method</span> <span class="n">Post</span> <span class="n">-Uri</span> <span class="s2">&quot;http://127.0.0.1:8000/api/subscriptions&quot;</span> <span class="n">-ContentType</span> <span class="s2">&quot;application/json&quot;</span> <span class="n">-Body</span> <span class="nv">$body</span>
+<span class="nb">Invoke-RestMethod</span> <span class="s2">&quot;http://127.0.0.1:8000/api/subscriptions&quot;</span>
+</code></pre></div></div>
+
+<h3 id="510">5.10 更新任务状态</h3>
+<p>验证通过后，把 <code>docs/tasks.md</code> 中的 <code>T-07</code> 标记为完成，并记录：</p>
+<ul>
+<li>实际创建的文件。</li>
+<li>手工验收结果。</li>
+<li>未覆盖的后续风险，例如“尚无自动测试”。</li>
+</ul>
+<p>不要让任务状态只停留在 AI 会话里。</p>
+<h2 id="6-ai">6. AI 应生成的产物</h2>
+<p>合格的 AI 输出应当包含这些文件，且不扩展无关功能：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>app/__init__.py
+app/database.py
+app/schemas.py
+app/repository.py
+app/routes.py
+app/main.py
+app/static/index.html
+app/static/app.js
+app/static/styles.css
+</code></pre></div></div>
+
+<p>同时应当能够解释：</p>
+<ul>
+<li>数据表包含哪些字段。</li>
+<li><code>POST /api/subscriptions</code> 如何校验金额、名称、货币和日期。</li>
+<li><code>created_at</code> 为什么由后端生成。</li>
+<li>前端提交后为什么需要重新调用 <code>GET /api/subscriptions</code>。</li>
+<li>数据库文件默认保存在哪里。</li>
+<li>如何通过 <code>DATABASE_PATH</code> 切换数据库位置。</li>
+</ul>
+<p>如果 AI 额外生成了 ORM、迁移系统、登录认证、React 前端、Docker、CI 或“未来可能用到”的模块，应当要求它撤回并重新限定范围。</p>
+<h2 id="7_1">7. 人工检查点</h2>
+<p>逐条检查以下内容，不要只看页面是否能打开：</p>
+<ul>
+<li>[ ] <code>requirements.txt</code> 只包含本章需要的依赖，没有额外框架。</li>
+<li>[ ] SQL 全部使用参数绑定，没有出现 f-string 或字符串拼接。</li>
+<li>[ ] <code>amount</code> 的类型是 <code>int</code>，不是 <code>float</code>，且要求大于 <code>0</code>。</li>
+<li>[ ] <code>created_at</code> 由后端生成，客户端不能提交该字段。</li>
+<li>[ ] <code>SubscriptionCreate</code> 不包含 <code>id</code> 和 <code>created_at</code>。</li>
+<li>[ ] <code>/health</code> 在静态文件挂载之前注册。</li>
+<li>[ ] API 前缀是 <code>/api/subscriptions</code>，没有散落在 <code>main.py</code> 里的重复路由。</li>
+<li>[ ] 数据库连接在 <code>get_db()</code> 的 <code>finally</code> 中关闭。</li>
+<li>[ ] 前端使用 <code>textContent</code> 或 <code>createElement</code> 渲染用户输入，没有 <code>innerHTML</code>。</li>
+<li>[ ] 提交成功后调用 <code>form.reset()</code> 和 <code>refresh()</code>。</li>
+<li>[ ] 提交失败时错误显示在 <code>#status</code>，而不是只在浏览器控制台里出现。</li>
+<li>[ ] 刷新页面后数据仍然存在，说明写入的是 SQLite，不是 JavaScript 内存变量。</li>
+</ul>
+<p>特别要检查 AI 是否“顺手”做了这些事：</p>
+<ul>
+<li>添加登录、权限或提醒。</li>
+<li>改成 SQLAlchemy、Tortoise、Prisma、Redis 或其他数据层。</li>
+<li>创建额外前端框架或构建工具。</li>
+<li>修改 <code>docs/</code>、<code>specs/</code> 或架构文档却未在输出中说明。</li>
+<li>返回 <code>200</code> 而不是 <code>201</code> 后，又悄悄修改验收标准。</li>
+</ul>
+<h2 id="8">8. 验收命令与通过标准</h2>
+<p>在项目根目录依次运行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">compileall</span> <span class="n">app</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">uvicorn</span> <span class="n">app</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</code></pre></div></div>
+
+<p>保持服务运行，另开一个终端检查健康状态：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="nb">Invoke-RestMethod</span> <span class="s2">&quot;http://127.0.0.1:8000/health&quot;</span>
+</code></pre></div></div>
+
+<p>通过标准：</p>
+<ul>
+<li><code>compileall</code> 没有语法错误。</li>
+<li><code>ruff check .</code> 退出码为 <code>0</code>。</li>
+<li><code>/health</code> 返回包含 <code>status</code> 为 <code>ok</code> 的 JSON。</li>
+<li><code>POST</code> 一条合法订阅后返回包含 <code>id</code> 和 <code>created_at</code> 的对象。</li>
+<li><code>GET /api/subscriptions</code> 能返回刚才创建的记录。</li>
+<li>浏览器刷新页面后记录仍然存在。</li>
+<li>服务日志中没有未处理异常。</li>
+</ul>
+<p>再检查非法金额：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-i</span> <span class="n">-X</span> <span class="n">POST</span> <span class="s2">&quot;http://127.0.0.1:8000/api/subscriptions&quot;</span> <span class="n">-H</span> <span class="s2">&quot;Content-Type: application/json&quot;</span> <span class="n">-d</span> <span class="s2">&quot;{\&quot;</span><span class="n">name</span><span class="p">\</span><span class="s2">&quot;:\&quot;</span><span class="n">Invalid</span><span class="p">\</span><span class="s2">&quot;,\&quot;</span><span class="n">amount</span><span class="p">\</span><span class="s2">&quot;:0,\&quot;</span><span class="n">currency</span><span class="p">\</span><span class="s2">&quot;:\&quot;</span><span class="n">CNY</span><span class="p">\</span><span class="s2">&quot;,\&quot;</span><span class="n">renewal_date</span><span class="p">\</span><span class="s2">&quot;:\&quot;</span><span class="n">2026</span><span class="p">-</span><span class="n">12</span><span class="p">-</span><span class="n">01</span><span class="p">\</span><span class="s2">&quot;,\&quot;</span><span class="n">note</span><span class="p">\</span><span class="s2">&quot;:\&quot;</span><span class="p">\</span><span class="s2">&quot;}&quot;</span>
+</code></pre></div></div>
+
+<p>通过标准：</p>
+<ul>
+<li>HTTP 状态码为 <code>422</code>。</li>
+<li>响应中包含与 <code>amount</code> 有关的校验错误。</li>
+<li><code>GET /api/subscriptions</code> 没有新增 <code>Invalid</code> 记录。</li>
+</ul>
+<p>如果使用 macOS 或 Linux，可直接使用 <code>curl</code> 代替 <code>curl.exe</code>。</p>
+<h2 id="9">9. 常见失败及恢复方法</h2>
+<h3 id="1-modulenotfounderror-no-module-named-app">失败 1：启动时提示 <code>ModuleNotFoundError: No module named 'app'</code></h3>
+<p><strong>症状</strong>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>ModuleNotFoundError: No module named &#39;app&#39;
+</code></pre></div></div>
+
+<p><strong>原因</strong>：通常是在 <code>app/</code> 目录内部启动，或者虚拟环境未激活，导致 Python 找不到项目根目录下的 <code>app</code> 包。</p>
+<p><strong>恢复动作</strong>：</p>
+<ol>
+<li>回到 <code>subscription-tracker/</code> 项目根目录。</li>
+<li>确认当前目录能看到 <code>app/</code> 和 <code>requirements.txt</code>。</li>
+<li>激活虚拟环境并重新安装依赖。</li>
+<li>使用完整模块路径启动：</li>
+</ol>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">uvicorn</span> <span class="n">app</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</code></pre></div></div>
+
+<h3 id="2-404-405">失败 2：页面能打开，但提交后返回 <code>404</code> 或 <code>405</code></h3>
+<p><strong>症状</strong>：</p>
+<p>浏览器状态区显示：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>404 Not Found
+</code></pre></div></div>
+
+<p>或：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>405 Method Not Allowed
+</code></pre></div></div>
+
+<p><strong>原因</strong>：常见原因包括路由前缀不一致、静态文件挂载顺序错误，或前端请求了错误地址。</p>
+<p><strong>恢复动作</strong>：</p>
+<ol>
+<li>检查 <code>app/routes.py</code> 的前缀是否为 <code>/api/subscriptions</code>。</li>
+<li>检查两个路由路径是否都是空字符串 <code>""</code>。</li>
+<li>检查 <code>app/static/app.js</code> 中的 <code>apiUrl</code> 是否为 <code>/api/subscriptions</code>。</li>
+<li>检查 <code>app/main.py</code> 中是否先 <code>include_router(router)</code>，再 <code>app.mount("/")</code>。</li>
+<li>重启服务后重新提交。</li>
+</ol>
+<h3 id="3api-500-internal-server-error-no-such-table-subscriptions">失败 3：API 返回 <code>500 Internal Server Error</code>，日志提示 <code>no such table: subscriptions</code></h3>
+<p><strong>症状</strong>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>sqlite3.OperationalError: no such table: subscriptions
+</code></pre></div></div>
+
+<p><strong>原因</strong>：数据库表没有初始化。可能是 <code>lifespan</code> 没有执行、<code>init_db()</code> 没有被调用，或者服务实际连接的数据库不是预期文件。</p>
+<p><strong>恢复动作</strong>：</p>
+<ol>
+<li>确认 <code>app/main.py</code> 使用了 <code>lifespan=lifespan</code>。</li>
+<li>确认 <code>lifespan()</code> 中调用了 <code>init_db()</code>。</li>
+<li>删除默认测试数据库文件，重新启动服务：</li>
+</ol>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="nb">Remove-Item</span> <span class="n">subscriptions</span><span class="p">.</span><span class="n">db</span> <span class="n">-ErrorAction</span> <span class="n">SilentlyContinue</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">uvicorn</span> <span class="n">app</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</code></pre></div></div>
+
+<ol start="4">
+<li>如果设置了 <code>DATABASE_PATH</code>，检查它指向的位置是否可写。</li>
+</ol>
+<h3 id="4-422">失败 4：提交表单时返回 <code>422</code>，但不知道哪个字段错误</h3>
+<p><strong>症状</strong>：</p>
+<p>状态区显示一大段 JSON，例如包含 <code>loc</code>、<code>msg</code> 和 <code>type</code>。</p>
+<p><strong>原因</strong>：FastAPI 使用 Pydantic 返回详细校验错误。前端当前直接把 <code>detail</code> 序列化显示，因此信息较原始。</p>
+<p><strong>恢复动作</strong>：</p>
+<ol>
+<li>先看响应中的 <code>loc</code>，它指出错误字段。</li>
+<li>常见修复：
+   - <code>amount</code> 必须是正整数，单位为分。
+   - <code>renewal_date</code> 必须是 <code>YYYY-MM-DD</code>。
+   - <code>currency</code> 去除空格后必须正好三个字符。
+   - <code>name</code> 去除空格后不能为空。</li>
+<li>暂时可以让 AI 优化错误展示，但不要在本章扩大到复杂前端状态管理。</li>
+</ol>
+<h3 id="5">失败 5：浏览器刷新后记录消失</h3>
+<p><strong>症状</strong>：</p>
+<p>添加后立即能看到记录，刷新页面后列表为空。</p>
+<p><strong>原因</strong>：数据只保存在前端 JavaScript 变量中，或后端没有真正提交 SQLite 事务。</p>
+<p><strong>恢复动作</strong>：</p>
+<ol>
+<li>检查 <code>repository.create_subscription()</code> 是否使用 <code>with connection:</code>。</li>
+<li>确认项目根目录生成了 <code>subscriptions.db</code>。</li>
+<li>用 <code>GET /api/subscriptions</code> 直接查询，而不是只看页面。</li>
+<li>如果 API 返回为空，说明写入没有成功；如果 API 有数据但页面为空，说明前端刷新或渲染逻辑有问题。</li>
+</ol>
+<h2 id="10-git">10. 本章 Git 提交</h2>
+<p>建议从一个新分支开始：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="k">switch</span> <span class="n">-c</span> <span class="n">feat</span><span class="p">/</span><span class="n">vertical-slice</span>
+</code></pre></div></div>
+
+<p>可以按职责拆成四次提交：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">add</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;chore: add subscription tracker runtime dependencies&quot;</span>
+
+<span class="n">git</span> <span class="n">add</span> <span class="n">app</span><span class="p">/</span><span class="n">__init__</span><span class="p">.</span><span class="n">py</span> <span class="n">app</span><span class="p">/</span><span class="n">database</span><span class="p">.</span><span class="n">py</span> <span class="n">app</span><span class="p">/</span><span class="n">schemas</span><span class="p">.</span><span class="n">py</span> <span class="n">app</span><span class="p">/</span><span class="n">repository</span><span class="p">.</span><span class="n">py</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;feat: persist subscriptions with sqlite&quot;</span>
+
+<span class="n">git</span> <span class="n">add</span> <span class="n">app</span><span class="p">/</span><span class="n">routes</span><span class="p">.</span><span class="n">py</span> <span class="n">app</span><span class="p">/</span><span class="n">main</span><span class="p">.</span><span class="n">py</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;feat: expose subscription api and health endpoint&quot;</span>
+
+<span class="n">git</span> <span class="n">add</span> <span class="n">app</span><span class="p">/</span><span class="n">static</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;feat: add minimal subscription web form&quot;</span>
+</code></pre></div></div>
+
+<p>提交前检查差异范围：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">status</span>
+<span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-stat</span>
+<span class="n">git</span> <span class="nb">diff</span>
+</code></pre></div></div>
+
+<p>如果 Diff 中出现了任务范围外的文件，先恢复它们，再提交：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">restore</span> <span class="n">PATH</span>
+</code></pre></div></div>
+
+<h2 id="11">11. 练习与扩展</h2>
+<p>完成主线后，可以选择一个练习，但每次仍然只做一个小变更：</p>
+<ol>
+<li>在列表中显示换算后的元金额，例如 <code>1500 分 = 15.00 CNY</code>。</li>
+<li>当列表为空时，显示“暂无订阅”。</li>
+<li>给 <code>note</code> 增加前端长度提示，并阻止超过 <code>500</code> 个字符。</li>
+<li>将 <code>renewal_date</code> 的默认值设置为下个月同一天。</li>
+<li>在页面中按续费日期排序，并与后端排序结果比较。</li>
+<li>把手工验收步骤整理到 <code>docs/runbooks/vertical-slice.md</code>。</li>
+</ol>
+<p>不要在本章扩展以下功能：</p>
+<ul>
+<li>修改和删除订阅。</li>
+<li>搜索、筛选和统计。</li>
+<li>CSV 导入导出。</li>
+<li>用户认证。</li>
+<li>自动提醒。</li>
+<li>数据库迁移工具。</li>
+</ul>
+<p>这些功能应当在后续章节以独立任务出现。</p>
+<h2 id="12">12. 参考资料</h2>
+<ul>
+<li>FastAPI：Static Files，https://fastapi.tiangolo.com/tutorial/static-files/</li>
+<li>FastAPI：Dependencies，https://fastapi.tiangolo.com/tutorial/dependencies/</li>
+<li>Python 标准库：sqlite3，https://docs.python.org/3/library/sqlite3.html</li>
+<li>Pydantic：Validators，https://docs.pydantic.dev/latest/concepts/validators/</li>
+<li>MDN：Using Fetch，https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch</li>
+</ul></article><nav class="pagenav"><a href="labs/lab02-project-blueprint.html"><small>← 上一篇</small>综合实验二：不写代码，完成项目蓝图</a><a class="next" href="chapters/ch08-small-steps-and-prs.html"><small>下一篇 →</small>第 8 章　AI 实现闭环：小任务、小 Diff、小 PR</a></nav></main>
+</div>
+<footer>AI 项目实战 · 从零生成、验收到持续维护 · 由纯静态 HTML 生成，可部署到 Cloudflare Pages / GitHub Pages</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

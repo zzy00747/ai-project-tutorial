@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化 · AI 项目实战</title>
+<script>(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
+</script>
+<style>:root{--bg:#faf9f7;--surface:#fff;--sidebar:#f3f2ee;--text:#1f2328;--text-2:#57606a;--border:#e4e2dc;--accent:#4f46e5;--accent-2:#7c3aed;--radius:10px;--shadow:0 1px 3px rgb(0 0 0/.08);--font-sans:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Cascadia Code",Consolas,"JetBrains Mono",monospace}
+[data-theme="dark"]{--bg:#101014;--surface:#18181f;--sidebar:#14141a;--text:#e6e6ea;--text-2:#9a9aa5;--border:#2a2a33;--accent:#818cf8;--accent-2:#a78bfa;--shadow:0 1px 3px rgb(0 0 0/.4)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 var(--font-sans)}
+a{color:var(--accent);text-decoration:none;transition:.15s ease}a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 20px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topbar .brand{font-weight:700;font-size:1.05rem;color:var(--text);white-space:nowrap}
+.topbar .brand small{color:var(--text-2);font-weight:400;margin-left:8px}
+.topbar .spacer{flex:1}
+.searchbox{position:relative;width:min(320px,40vw)}
+.searchbox input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:inherit}
+.searchbox input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.search-results{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);max-height:340px;overflow:auto;display:none}
+.search-results a{display:block;padding:8px 14px;color:var(--text);border-bottom:1px solid var(--border)}
+.search-results a:last-child{border-bottom:0}
+.search-results a b{color:var(--accent)}
+.search-results a small{display:block;color:var(--text-2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-empty{padding:10px 14px;color:var(--text-2);font-size:.9rem}
+.theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit}
+.theme-btn:hover{border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;align-items:start}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;padding:18px 14px 40px;background:var(--sidebar);border-right:1px solid var(--border)}
+.sidebar .group{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin:18px 10px 6px;font-weight:600}
+.sidebar a{display:block;padding:6px 10px;border-radius:8px;color:var(--text);font-size:.92rem;line-height:1.5;border-left:3px solid transparent;margin:1px 0}
+.sidebar a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);text-decoration:none}
+.sidebar a.active{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.content{padding:36px 32px 80px;min-width:0}
+article{max-width:76ch;margin:0 auto;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+article h1{font-size:1.9rem;line-height:1.35;margin:0 0 .8em}
+article h2{font-size:1.4rem;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--border)}
+article h3{font-size:1.15rem;margin:1.6em 0 .5em}
+article h4{font-size:1rem;margin:1.4em 0 .4em}
+article p{text-align:justify;margin:.9em 0}
+article ul,article ol{padding-left:1.6em;margin:.8em 0}
+article li{margin:.35em 0}
+article blockquote{margin:1.2em 0;padding:.8em 1.1em;background:var(--surface);border-left:3px solid var(--accent);border-radius:var(--radius);color:var(--text-2)}
+article blockquote p{margin:.3em 0;text-align:left}
+article hr{border:0;border-top:1px solid var(--border);margin:2em 0}
+article img{max-width:100%;border-radius:var(--radius)}
+code{font-family:var(--font-mono);font-size:.9em;background:color-mix(in srgb,var(--accent) 10%,transparent);padding:.15em .4em;border-radius:5px}
+pre{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1em 1.1em;overflow:auto;font-size:.88rem;line-height:1.6;margin:1.1em 0}
+pre code{background:none;padding:0}
+.code-wrap{position:relative;margin:1.1em 0}
+.code-wrap pre{margin:0}
+.copy-btn{position:absolute;top:8px;right:8px;z-index:2;border:1px solid var(--border);background:var(--bg);color:var(--text-2);border-radius:6px;padding:3px 9px;font-size:.75rem;cursor:pointer;opacity:0;transition:.15s ease;font-family:var(--font-sans)}
+.code-wrap:hover .copy-btn{opacity:1}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:#16a34a;border-color:#16a34a;opacity:1}
+.tbl-wrap{overflow:auto;margin:1.2em 0}
+article table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface);border-radius:var(--radius)}
+article th{background:var(--sidebar);font-weight:600;text-align:left}
+article th,article td{border:1px solid var(--border);padding:.5em .75em}
+article tbody tr:nth-child(even){background:color-mix(in srgb,var(--sidebar) 55%,transparent)}
+.pagenav{display:flex;justify-content:space-between;gap:12px;margin-top:3em;padding-top:1.2em;border-top:1px solid var(--border)}
+.pagenav a{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:46%}
+.pagenav a small{display:block;color:var(--text-2);font-size:.78rem}
+.pagenav a.next{text-align:right;margin-left:auto}
+footer{padding:26px 20px;color:var(--text-2);font-size:.85rem;text-align:center;border-top:1px solid var(--border)}
+.hamburger{display:none;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;color:var(--text)}
+@media (max-width:900px){
+.layout{display:block}
+.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;width:280px;transform:translateX(-100%);transition:transform .2s ease;height:100vh;border-right:1px solid var(--border)}
+.sidebar.open{transform:none;box-shadow:0 0 40px rgb(0 0 0/.25)}
+.hamburger{display:inline-block}
+.content{padding:24px 18px 60px}
+.searchbox{width:min(200px,38vw)}
+}
+@media print{.topbar,.sidebar,.pagenav,.copy-btn{display:none!important}.layout{display:block}.content{padding:0}.article,article{max-width:none}}
+.hl{background:transparent}
+:root:not([data-theme="dark"]) .hl{pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #ffffcc }
+.hl { background: #f0f0f0; }
+.hl .c { color: #60A0B0; font-style: italic } /* Comment */
+.hl .err { border: 1px solid #F00 } /* Error */
+.hl .k { color: #007020; font-weight: bold } /* Keyword */
+.hl .o { color: #666 } /* Operator */
+.hl .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.hl .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.hl .cp { color: #007020 } /* Comment.Preproc */
+.hl .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.hl .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.hl .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.hl .gd { color: #A00000 } /* Generic.Deleted */
+.hl .ge { font-style: italic } /* Generic.Emph */
+.hl .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F00 } /* Generic.Error */
+.hl .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.hl .gi { color: #00A000 } /* Generic.Inserted */
+.hl .go { color: #888 } /* Generic.Output */
+.hl .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.hl .gs { font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.hl .gt { color: #04D } /* Generic.Traceback */
+.hl .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.hl .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.hl .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.hl .kp { color: #007020 } /* Keyword.Pseudo */
+.hl .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.hl .kt { color: #902000 } /* Keyword.Type */
+.hl .m { color: #40A070 } /* Literal.Number */
+.hl .s { color: #4070A0 } /* Literal.String */
+.hl .na { color: #4070A0 } /* Name.Attribute */
+.hl .nb { color: #007020 } /* Name.Builtin */
+.hl .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.hl .no { color: #60ADD5 } /* Name.Constant */
+.hl .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.hl .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.hl .ne { color: #007020 } /* Name.Exception */
+.hl .nf { color: #06287E } /* Name.Function */
+.hl .nl { color: #002070; font-weight: bold } /* Name.Label */
+.hl .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.hl .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.hl .nv { color: #BB60D5 } /* Name.Variable */
+.hl .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.hl .w { color: #BBB } /* Text.Whitespace */
+.hl .mb { color: #40A070 } /* Literal.Number.Bin */
+.hl .mf { color: #40A070 } /* Literal.Number.Float */
+.hl .mh { color: #40A070 } /* Literal.Number.Hex */
+.hl .mi { color: #40A070 } /* Literal.Number.Integer */
+.hl .mo { color: #40A070 } /* Literal.Number.Oct */
+.hl .sa { color: #4070A0 } /* Literal.String.Affix */
+.hl .sb { color: #4070A0 } /* Literal.String.Backtick */
+.hl .sc { color: #4070A0 } /* Literal.String.Char */
+.hl .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.hl .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.hl .s2 { color: #4070A0 } /* Literal.String.Double */
+.hl .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.hl .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.hl .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.hl .sx { color: #C65D09 } /* Literal.String.Other */
+.hl .sr { color: #235388 } /* Literal.String.Regex */
+.hl .s1 { color: #4070A0 } /* Literal.String.Single */
+.hl .ss { color: #517918 } /* Literal.String.Symbol */
+.hl .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #06287E } /* Name.Function.Magic */
+.hl .vc { color: #BB60D5 } /* Name.Variable.Class */
+.hl .vg { color: #BB60D5 } /* Name.Variable.Global */
+.hl .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.hl .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.hl .il { color: #40A070 } /* Literal.Number.Integer.Long */}
+[data-theme="dark"] .hl{pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F8F8F2 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #F8F8F2 } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #F8F8F2 } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */}
+</style>
+</head>
+<body>
+<header class="topbar">
+<button class="hamburger" aria-label="打开目录">☰</button>
+<a class="brand" href="index.html">AI 项目实战<small>从零生成、验收到持续维护</small></a>
+<div class="spacer"></div>
+<div class="searchbox">
+<input type="search" placeholder="搜索教程内容…" aria-label="搜索">
+<div class="search-results"></div>
+</div>
+<button class="theme-btn" aria-label="切换主题">🌓</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目录"><div class="group">开始</div>
+<a href="index.html" data-nav="index.html">AI 项目实战：从零生成、验收到持续维护</a>
+<div class="group">第一部分 · 建立正确的 AI 开发方式</div>
+<a href="chapters/ch01-why-projects-fail.html" data-nav="chapters/ch01-why-projects-fail.html">第 1 章　AI 能生成代码，为什么项目仍然会失败</a>
+<a href="labs/lab01-disposable-prototype.html" data-nav="labs/lab01-disposable-prototype.html">实验 1：一次性原型——生成、观察、修改、丢弃</a>
+<a href="chapters/ch02-project-basics.html" data-nav="chapters/ch02-project-basics.html">第 2 章　零基础必备：看懂项目、运行项目和阅读报错</a>
+<a href="chapters/ch03-git-safety.html" data-nav="chapters/ch03-git-safety.html">第 3 章　Git：AI 开发的安全带与时间机器</a>
+<div class="group">第二部分 · 从想法到可实施规格</div>
+<a href="chapters/ch04-intent-and-acceptance.html" data-nav="chapters/ch04-intent-and-acceptance.html">第 4 章　从想法到意图：先决定不做什么</a>
+<a href="chapters/ch05-spec-driven-development.html" data-nav="chapters/ch05-spec-driven-development.html">第 5 章　规格驱动开发：把需求写成可验证契约</a>
+<a href="chapters/ch06-architecture-and-planning.html" data-nav="chapters/ch06-architecture-and-planning.html">第 6 章　最小架构、技术决策与任务拆分</a>
+<a href="labs/lab02-project-blueprint.html" data-nav="labs/lab02-project-blueprint.html">综合实验二：不写代码，完成项目蓝图</a>
+<div class="group">第三部分 · AI 生成、验证与首次交付</div>
+<a href="chapters/ch07-vertical-slice.html" data-nav="chapters/ch07-vertical-slice.html">第 7 章　纵向打通：生成第一个真正可用的版本</a>
+<a href="chapters/ch08-small-steps-and-prs.html" data-nav="chapters/ch08-small-steps-and-prs.html">第 8 章　AI 实现闭环：小任务、小 Diff、小 PR</a>
+<a href="chapters/ch09-testing-and-debugging.html" data-nav="chapters/ch09-testing-and-debugging.html">第 9 章　测试与调试：让“AI 说完成”变成可验证事实</a>
+<a href="chapters/ch10-context-engineering.html" data-nav="chapters/ch10-context-engineering.html">第 10 章　上下文工程：让 AI 在新会话中也能接手项目</a>
+<a href="chapters/ch11-ci-release-deploy.html" data-nav="chapters/ch11-ci-release-deploy.html">第 11 章　CI、发布与部署：从本地能跑到别人能用</a>
+<a href="labs/lab03-release-v1.html" data-nav="labs/lab03-release-v1.html">综合实验三：交付第一个正式版本 v1.0</a>
+<div class="group">第四部分 · 从会生成到能长期维护</div>
+<a href="chapters/ch12-issue-driven-maintenance.html" data-nav="chapters/ch12-issue-driven-maintenance.html">第 12 章　Issue 驱动维护：从问题报告到修复 PR</a>
+<a href="chapters/ch13-change-and-refactoring.html" data-nav="chapters/ch13-change-and-refactoring.html">第 13 章　需求演化与重构：修改系统，而不是重新生成系统</a>
+<a href="chapters/ch14-legacy-modernization.html" data-nav="chapters/ch14-legacy-modernization.html">第 14 章　接手旧项目：从陌生仓库到受控现代化</a>
+<a href="chapters/ch15-data-migration-recovery.html" data-nav="chapters/ch15-data-migration-recovery.html">第 15 章　数据库迁移、备份与真正的故障恢复</a>
+<a href="chapters/ch16-long-term-maintenance.html" data-nav="chapters/ch16-long-term-maintenance.html">第 16 章　长期维护系统：依赖、安全、运行观测与文档漂移</a>
+<a href="labs/lab04-evolution-v1-1.html" data-nav="labs/lab04-evolution-v1-1.html">综合实验四：完成一次完整的需求演化（v1.1）</a>
+<a href="labs/lab05-three-month-maintenance.html" data-nav="labs/lab05-three-month-maintenance.html">综合实验五：模拟项目上线三个月</a>
+<div class="group">第五部分 · 沉淀为可复用的 AI 工程能力</div>
+<a href="chapters/ch17-skill-engineering.html" data-nav="chapters/ch17-skill-engineering.html">第 17 章　Skill 工程：把有效协作流程变成项目资产</a>
+<a href="chapters/ch18-subagents-and-automation.html" data-nav="chapters/ch18-subagents-and-automation.html">第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化</a>
+<a href="chapters/ch19-platforms-and-tool-migration.html" data-nav="chapters/ch19-platforms-and-tool-migration.html">第 19 章　平台对照与工具迁移：不被某个产品绑定</a>
+<a href="chapters/ch20-capstone.html" data-nav="chapters/ch20-capstone.html">第 20 章　结业项目：完成你自己的 AI 生成与维护闭环</a>
+<div class="group">附录</div>
+<a href="appendices/A-environment.html" data-nav="appendices/A-environment.html">附录 A　开发环境与故障速查</a>
+<a href="appendices/B-command-reference.html" data-nav="appendices/B-command-reference.html">附录 B　命令速查</a>
+<a href="appendices/C-failure-catalog.html" data-nav="appendices/C-failure-catalog.html">附录 C　故障与恢复目录</a>
+<a href="appendices/D-glossary.html" data-nav="appendices/D-glossary.html">附录 D　术语表</a>
+<a href="appendices/E-sources.html" data-nav="appendices/E-sources.html">附录 E　资料来源与核验说明</a>
+<div class="group">可复制模板</div>
+<a href="templates-intro.html" data-nav="templates-intro.html">附录 F：可复制模板原文</a>
+<a href="templates/intent.html" data-nav="templates/intent.html">项目意图（Intent）</a>
+<a href="templates/spec.html" data-nav="templates/spec.html">功能规格（Spec）</a>
+<a href="templates/plan.html" data-nav="templates/plan.html">实施计划（Plan）</a>
+<a href="templates/tasks.html" data-nav="templates/tasks.html">任务列表（Tasks）</a>
+<a href="templates/adr.html" data-nav="templates/adr.html">架构决策记录（ADR-XXXX：标题）</a>
+<a href="templates/issue.html" data-nav="templates/issue.html">Issue：[类型] 一句话描述问题或需求</a>
+<a href="templates/bug-report.html" data-nav="templates/bug-report.html">Bug 报告与诊断记录</a>
+<a href="templates/pr-checklist.html" data-nav="templates/pr-checklist.html">PR 检查清单</a>
+<a href="templates/release-checklist.html" data-nav="templates/release-checklist.html">发布检查清单（Release）</a>
+<a href="templates/runbook.html" data-nav="templates/runbook.html">运行维护手册（Runbook）</a>
+<a href="templates/handoff.html" data-nav="templates/handoff.html">会话交接文档（Handoff）</a>
+<a href="templates/definition-of-done.html" data-nav="templates/definition-of-done.html">完成定义（Definition of Done）</a></nav>
+<main class="content"><article><h1 id="18-agenthooks-issue-to-pr">第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化</h1>
+<blockquote>
+<p>本章成果：用隔离的子任务、独立工作区和明确闸门，把一次订阅管理器修复变成可审查的 Issue-to-PR 流程。</p>
+</blockquote>
+<h2 id="1">1. 本章成果</h2>
+<p>你将完成一次半自动维护演练：从一个明确 Issue 出发，让规划、实现、验证和评审分别在不同上下文或不同工作区中进行，最后形成可人工合并的 PR。本章还会建立一个自主度阶梯，判断哪些动作可以由 AI 自动执行，哪些必须保留人工闸门。</p>
+<p>完成后的产物包括：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>docs/issues/renewal-date-validation.md
+docs/handoff/renewal-date-validation.md
+docs/verification/renewal-date-validation.md
+</code></pre></div></div>
+
+<p>以及一个独立 Worktree 中的修复分支和评审记录。</p>
+<h2 id="2">2. 为什么需要它</h2>
+<p>多个 Agent 并不天然等于更快。拆分的第一个价值是<strong>上下文隔离</strong>：研究、实现、评审分别只保留自己需要的信息，避免一段长对话里既有旧需求、又有失败尝试、还有未验证结论。第二个价值是<strong>职责分离</strong>：实现者容易相信自己已经完成，独立评审者只看证据和 Diff，更容易发现问题。</p>
+<p>但拆分也有成本：交接信息可能丢失，多个工作区可能修改冲突，自动化可能反复循环而无人叫停。因此不要从多 Agent 开始第一个项目。先具备小任务、测试、CI 和人工评审，再逐步引入自动化。</p>
+<h2 id="3">3. 最少必备知识</h2>
+<ul>
+<li><strong>主 Agent</strong>：掌握总体计划，负责拆任务、交接和整合，不亲自完成所有深度工作。</li>
+<li><strong>子 Agent</strong>：在干净上下文中完成一个可独立验收的任务，只返回结论、证据和产物。</li>
+<li><strong>上下文压缩</strong>：长会话接近限制时，把关键事实写入文件，再开新会话。</li>
+<li><strong>Git Worktree</strong>：同一仓库在不同目录中检出不同分支，便于隔离并行修改。</li>
+<li><strong>Hook</strong>：在特定工具事件前后自动执行检查；它提供快速反馈，但不能替代独立 CI。</li>
+<li><strong>自主度闸门</strong>：每个级别明确谁能写文件、谁能运行命令、谁能合并。</li>
+</ul>
+<h2 id="4">4. 起始项目状态</h2>
+<p>从第 17 章后的项目开始，工作区应干净，核心检查通过：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">status</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">pytest</span> <span class="n">-q</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
+</code></pre></div></div>
+
+<p>本章的练习 Issue 使用：<code>renewal_date</code> 早于当前日期时没有明确校验。修复应让 API 拒绝无效日期，并保留清晰的 422 或项目既有错误格式。</p>
+<h2 id="5-ai">5. 操作步骤与 AI 任务示例</h2>
+<h3 id="issue">第一步：把 Issue 写成可验收任务</h3>
+<p>创建 <code>docs/issues/renewal-date-validation.md</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gh"># renewal_date 缺少过去日期校验</span>
+
+现象：通过 API 可以创建 renewal_date 早于今天的订阅。
+验收：
+<span class="k">-</span><span class="w"> </span>请求返回项目既有的校验错误格式。
+<span class="k">-</span><span class="w"> </span>合法日期仍可创建。
+<span class="k">-</span><span class="w"> </span>增加回归测试。
+<span class="k">-</span><span class="w"> </span>不改变数据库字段。
+</code></pre></div></div>
+
+<h3 id="agent">第二步：让规划子 Agent 只读分析</h3>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：分析 renewal_date 校验的影响范围，不修改代码。
+上下文：Issue、AGENTS.md、app/schemas.py、app/repository.py、相关测试。
+范围：只读；禁止写文件和运行会改变状态的命令。
+约束：找出最小修改点；区分现有测试缺口和实现缺陷。
+验收：列出影响文件、建议方案、回归测试和风险。
+输出：简短规划报告。
+</code></pre></div></div>
+
+<p>规划完成后，把结果写入 <code>docs/handoff/renewal-date-validation.md</code>。交接文件必须包含目标、已完成分析、允许修改范围、禁止事项和验证命令。</p>
+<h3 id="worktree">第三步：创建独立 Worktree</h3>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="k">switch</span> <span class="n">main</span>
+<span class="n">git</span> <span class="n">pull</span>
+<span class="n">git</span> <span class="n">worktree</span> <span class="n">add</span> <span class="p">../</span><span class="n">subscription-tracker-renewal-fix</span> <span class="n">-b</span> <span class="n">fix</span><span class="p">/</span><span class="n">renewal-date-validation</span>
+<span class="nb">cd </span><span class="p">../</span><span class="n">subscription-tracker-renewal-fix</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">venv</span>
+<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div></div>
+
+<p>macOS/Linux 将激活命令替换为：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</code></pre></div></div>
+
+<p>每个 Worktree 应拥有自己的虚拟环境，避免不同分支的依赖互相污染。查看和清理由主目录执行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">worktree</span> <span class="n">list</span>
+<span class="n">git</span> <span class="n">worktree</span> <span class="n">remove</span> <span class="p">../</span><span class="n">subscription-tracker-renewal-fix</span>
+</code></pre></div></div>
+
+<h3 id="agent_1">第四步：实现子 Agent 在隔离目录中修复</h3>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：修复 renewal_date 缺少过去日期校验的问题。
+上下文：docs/handoff/renewal-date-validation.md、AGENTS.md、相关模块与测试。
+范围：只允许修改 app/schemas.py、app/repository.py、tests/test_api.py。
+约束：不修改数据库 schema；不重构无关代码；保留既有错误响应格式。
+验收：新增非法过去日期和合法日期两个测试；pytest 与 Ruff 通过。
+输出：修改文件列表、关键 Diff、真实命令结果。
+</code></pre></div></div>
+
+<p>实现结束后不要在同一会话中宣布验收，改为独立验证。</p>
+<h3 id="hook-ci">第五步：用 Hook 和 CI 形成两层反馈</h3>
+<p>Hook 与 CI 的职责不同。Hook 在本地尽早反馈，CI 在独立环境做最终门禁。具体配置格式取决于所用工具，以下只是<strong>示意结构</strong>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;before_commit&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python -m pytest -q &amp;&amp; python -m ruff check .&quot;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>CI 仍应运行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python -m pip install -r requirements.txt</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python -m pytest -q</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python -m ruff check .</span>
+</code></pre></div></div>
+
+<p>如果本地 Hook 被绕过，CI 必须仍能拦住问题。</p>
+<h3 id="agent_2">第六步：独立评审子 Agent 只读检查</h3>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：评审 fix/renewal-date-validation，不修改代码。
+上下文：Issue、交接文件、git diff --stat、git diff、测试与 CI 结果。
+范围：只读。
+约束：不信任实现会话的自述；只根据 Diff、命令输出和测试判断。
+验收：逐条检查 Issue 验收条件，并指出未覆盖风险。
+输出：通过、请求修改或阻断，以及证据。
+</code></pre></div></div>
+
+<h3 id="_1">第七步：人工合并并记录自主度</h3>
+<p>人工最终确认 Diff、测试结果和发布影响，再合并 PR。将“哪些步骤自动、哪些步骤人工”写入维护记录，为后续提高自动化程度留下依据。</p>
+<h2 id="6-ai">6. AI 应生成的产物</h2>
+<ul>
+<li>可验收 Issue 与交接文件；</li>
+<li>规划报告，说明影响范围和禁止事项；</li>
+<li>Worktree 中的最小修复 Diff；</li>
+<li>新增回归测试；</li>
+<li>验证报告，包含 pytest、Ruff 和 <code>git diff --check</code> 的真实输出；</li>
+<li>独立评审结论；</li>
+<li>PR 描述，说明根因、修改、风险和验证证据。</li>
+</ul>
+<p>如果使用的是 OpenHands 或 GitHub Copilot coding agent 等具备 Issue-to-PR 能力的平台，最终仓库中仍应看到同样的产物：Issue、分支、代码 Diff、测试、评审和合并记录。工具可以代替手工操作，但不能代替证据。</p>
+<h2 id="7">7. 人工检查点</h2>
+<ul>
+<li>检查 Worktree 是否只包含本章分支，没有混入其他实验文件。</li>
+<li>查看 <code>git diff --stat</code>：是否只改了预期文件。</li>
+<li>确认实现、验证和评审没有共用同一段长对话。</li>
+<li>检查交接文件是否足够让新会话继续，而不是只有“请参考上文”。</li>
+<li>确认 Hook 只加速本地反馈，CI 仍是独立门禁。</li>
+<li>若自动化反复失败，检查是否设置了最大尝试次数、超时和升级人工的条件。</li>
+<li>合并前确认数据库没有被偷偷修改，尤其是迁移类任务。</li>
+</ul>
+<h2 id="8">8. 验收命令与通过标准</h2>
+<p>在修复 Worktree 中运行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">status</span>
+<span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-stat</span>
+<span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-check</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">pytest</span> <span class="n">-q</span>
+<span class="n">python</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
+<span class="n">python</span> <span class="n">skills</span><span class="p">\</span><span class="n">verify-change</span><span class="p">\</span><span class="n">scripts</span><span class="p">\</span><span class="n">check_report</span><span class="p">.</span><span class="n">py</span> <span class="n">docs</span><span class="p">\</span><span class="n">verification</span><span class="p">\</span><span class="n">renewal-date-validation</span><span class="p">.</span><span class="nb">md</span>
+</code></pre></div></div>
+
+<p>通过标准：</p>
+<ul>
+<li>工作区除预期修复外没有其他变更；</li>
+<li>非法过去日期被拒绝，合法日期仍可创建；</li>
+<li>pytest 与 Ruff 真实退出码为 0；</li>
+<li>验证报告结构检查通过；</li>
+<li>独立评审没有遗留阻断问题；</li>
+<li>Worktree 清理成功，主仓库不受影响。</li>
+</ul>
+<p>不要以“子 Agent 说完成”作为通过证据。</p>
+<h2 id="9">9. 常见失败及恢复方法</h2>
+<ol>
+<li><strong>症状：两个并行任务修改同一文件后无法合并。</strong> 原因：任务没有按文件和目录隔离。恢复：中止合并，重新划分任务边界，每个 Worktree 只负责一个可独立验收的变更。</li>
+<li><strong>症状：新会话不知道之前为什么这样修改。</strong> 原因：上下文压缩后关键事实没有落盘。恢复：补写 <code>docs/handoff/</code>，记录目标、约束、已完成分析和验证命令。</li>
+<li><strong>症状：自动化循环反复修改同一个测试。</strong> 原因：没有停止条件和失败预算。恢复：限制尝试次数，保存轨迹，升级人工；先修验收标准，再继续自动化。</li>
+<li><strong>症状：本地 Hook 通过但 CI 失败。</strong> 原因：环境或依赖不一致。恢复：以 CI 为准；检查虚拟环境、依赖锁定和测试数据。</li>
+<li><strong>症状：平台拥有过宽的仓库或云资源权限。</strong> 原因：为了省事授予全部权限。恢复：先在测试仓库运行，使用最小权限和只读评审，再逐步放开。</li>
+</ol>
+<h2 id="10-git">10. 本章 Git 提交</h2>
+<p>建议分支：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>fix/renewal-date-validation
+</code></pre></div></div>
+
+<p>提交可拆为：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">add</span> <span class="n">docs</span><span class="p">/</span><span class="n">issues</span> <span class="n">docs</span><span class="p">/</span><span class="n">handoff</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;docs: add renewal date validation issue&quot;</span>
+<span class="n">git</span> <span class="n">add</span> <span class="n">app</span> <span class="n">tests</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;fix: reject renewal dates in the past&quot;</span>
+<span class="n">git</span> <span class="n">add</span> <span class="n">docs</span><span class="p">/</span><span class="n">verification</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;docs: record verification evidence&quot;</span>
+</code></pre></div></div>
+
+<p>PR 合并后删除远程分支，再清理 Worktree。</p>
+<h2 id="11">11. 练习与扩展</h2>
+<ul>
+<li>给规划、实现、评审分别设置最大尝试次数，并记录第一次需要人工介入的原因。</li>
+<li>将“只读研究”“可写实现”“只读评审”写成三个不同的任务模板，避免一个 Agent 同时承担所有角色。</li>
+<li>比较串行流程与两个真正独立任务的 Worktree 流程；如果并行没有减少总时间或提高质量，就不要为了并行而并行。</li>
+<li>在测试仓库中体验 OpenHands 或 Copilot coding agent 的 Issue-to-PR 流程，再回到本项目比较证据完整性。</li>
+</ul>
+<h2 id="12">12. 参考资料</h2>
+<ul>
+<li><a href="https://docs.openhands.dev/openhands/usage/use-cases/software-factory.html">OpenHands：Software Factory</a>：Issue、开发 PR、评审、测试与合并的闭环示例。</li>
+<li><a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent">GitHub Copilot coding agent</a>：从任务到 PR 的官方能力与适用边界。</li>
+<li><a href="https://git-scm.com/docs/git-worktree">Git worktree</a>：多工作区隔离。</li>
+<li><a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents">Anthropic：Effective context engineering</a>：上下文隔离、压缩和子任务交接。</li>
+</ul></article><nav class="pagenav"><a href="chapters/ch17-skill-engineering.html"><small>← 上一篇</small>第 17 章　Skill 工程：把有效协作流程变成项目资产</a><a class="next" href="chapters/ch19-platforms-and-tool-migration.html"><small>下一篇 →</small>第 19 章　平台对照与工具迁移：不被某个产品绑定</a></nav></main>
+</div>
+<footer>AI 项目实战 · 从零生成、验收到持续维护 · 由纯静态 HTML 生成，可部署到 Cloudflare Pages / GitHub Pages</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

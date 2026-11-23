@@ -1,0 +1,6 @@
+# Markdown 源文件（site/ 为构建产物，源码在 src/）
+*.pyc
+__pycache__/
+.venv/
+*.db
+*.log

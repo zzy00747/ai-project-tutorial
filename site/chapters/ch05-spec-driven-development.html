@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 5 章　规格驱动开发：把需求写成可验证契约 · AI 项目实战</title>
+<script>(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
+</script>
+<style>:root{--bg:#faf9f7;--surface:#fff;--sidebar:#f3f2ee;--text:#1f2328;--text-2:#57606a;--border:#e4e2dc;--accent:#4f46e5;--accent-2:#7c3aed;--radius:10px;--shadow:0 1px 3px rgb(0 0 0/.08);--font-sans:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Cascadia Code",Consolas,"JetBrains Mono",monospace}
+[data-theme="dark"]{--bg:#101014;--surface:#18181f;--sidebar:#14141a;--text:#e6e6ea;--text-2:#9a9aa5;--border:#2a2a33;--accent:#818cf8;--accent-2:#a78bfa;--shadow:0 1px 3px rgb(0 0 0/.4)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 var(--font-sans)}
+a{color:var(--accent);text-decoration:none;transition:.15s ease}a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 20px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topbar .brand{font-weight:700;font-size:1.05rem;color:var(--text);white-space:nowrap}
+.topbar .brand small{color:var(--text-2);font-weight:400;margin-left:8px}
+.topbar .spacer{flex:1}
+.searchbox{position:relative;width:min(320px,40vw)}
+.searchbox input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:inherit}
+.searchbox input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.search-results{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);max-height:340px;overflow:auto;display:none}
+.search-results a{display:block;padding:8px 14px;color:var(--text);border-bottom:1px solid var(--border)}
+.search-results a:last-child{border-bottom:0}
+.search-results a b{color:var(--accent)}
+.search-results a small{display:block;color:var(--text-2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-empty{padding:10px 14px;color:var(--text-2);font-size:.9rem}
+.theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit}
+.theme-btn:hover{border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;align-items:start}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;padding:18px 14px 40px;background:var(--sidebar);border-right:1px solid var(--border)}
+.sidebar .group{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin:18px 10px 6px;font-weight:600}
+.sidebar a{display:block;padding:6px 10px;border-radius:8px;color:var(--text);font-size:.92rem;line-height:1.5;border-left:3px solid transparent;margin:1px 0}
+.sidebar a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);text-decoration:none}
+.sidebar a.active{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.content{padding:36px 32px 80px;min-width:0}
+article{max-width:76ch;margin:0 auto;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+article h1{font-size:1.9rem;line-height:1.35;margin:0 0 .8em}
+article h2{font-size:1.4rem;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--border)}
+article h3{font-size:1.15rem;margin:1.6em 0 .5em}
+article h4{font-size:1rem;margin:1.4em 0 .4em}
+article p{text-align:justify;margin:.9em 0}
+article ul,article ol{padding-left:1.6em;margin:.8em 0}
+article li{margin:.35em 0}
+article blockquote{margin:1.2em 0;padding:.8em 1.1em;background:var(--surface);border-left:3px solid var(--accent);border-radius:var(--radius);color:var(--text-2)}
+article blockquote p{margin:.3em 0;text-align:left}
+article hr{border:0;border-top:1px solid var(--border);margin:2em 0}
+article img{max-width:100%;border-radius:var(--radius)}
+code{font-family:var(--font-mono);font-size:.9em;background:color-mix(in srgb,var(--accent) 10%,transparent);padding:.15em .4em;border-radius:5px}
+pre{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1em 1.1em;overflow:auto;font-size:.88rem;line-height:1.6;margin:1.1em 0}
+pre code{background:none;padding:0}
+.code-wrap{position:relative;margin:1.1em 0}
+.code-wrap pre{margin:0}
+.copy-btn{position:absolute;top:8px;right:8px;z-index:2;border:1px solid var(--border);background:var(--bg);color:var(--text-2);border-radius:6px;padding:3px 9px;font-size:.75rem;cursor:pointer;opacity:0;transition:.15s ease;font-family:var(--font-sans)}
+.code-wrap:hover .copy-btn{opacity:1}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:#16a34a;border-color:#16a34a;opacity:1}
+.tbl-wrap{overflow:auto;margin:1.2em 0}
+article table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface);border-radius:var(--radius)}
+article th{background:var(--sidebar);font-weight:600;text-align:left}
+article th,article td{border:1px solid var(--border);padding:.5em .75em}
+article tbody tr:nth-child(even){background:color-mix(in srgb,var(--sidebar) 55%,transparent)}
+.pagenav{display:flex;justify-content:space-between;gap:12px;margin-top:3em;padding-top:1.2em;border-top:1px solid var(--border)}
+.pagenav a{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:46%}
+.pagenav a small{display:block;color:var(--text-2);font-size:.78rem}
+.pagenav a.next{text-align:right;margin-left:auto}
+footer{padding:26px 20px;color:var(--text-2);font-size:.85rem;text-align:center;border-top:1px solid var(--border)}
+.hamburger{display:none;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;color:var(--text)}
+@media (max-width:900px){
+.layout{display:block}
+.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;width:280px;transform:translateX(-100%);transition:transform .2s ease;height:100vh;border-right:1px solid var(--border)}
+.sidebar.open{transform:none;box-shadow:0 0 40px rgb(0 0 0/.25)}
+.hamburger{display:inline-block}
+.content{padding:24px 18px 60px}
+.searchbox{width:min(200px,38vw)}
+}
+@media print{.topbar,.sidebar,.pagenav,.copy-btn{display:none!important}.layout{display:block}.content{padding:0}.article,article{max-width:none}}
+.hl{background:transparent}
+:root:not([data-theme="dark"]) .hl{pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #ffffcc }
+.hl { background: #f0f0f0; }
+.hl .c { color: #60A0B0; font-style: italic } /* Comment */
+.hl .err { border: 1px solid #F00 } /* Error */
+.hl .k { color: #007020; font-weight: bold } /* Keyword */
+.hl .o { color: #666 } /* Operator */
+.hl .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.hl .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.hl .cp { color: #007020 } /* Comment.Preproc */
+.hl .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.hl .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.hl .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.hl .gd { color: #A00000 } /* Generic.Deleted */
+.hl .ge { font-style: italic } /* Generic.Emph */
+.hl .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F00 } /* Generic.Error */
+.hl .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.hl .gi { color: #00A000 } /* Generic.Inserted */
+.hl .go { color: #888 } /* Generic.Output */
+.hl .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.hl .gs { font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.hl .gt { color: #04D } /* Generic.Traceback */
+.hl .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.hl .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.hl .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.hl .kp { color: #007020 } /* Keyword.Pseudo */
+.hl .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.hl .kt { color: #902000 } /* Keyword.Type */
+.hl .m { color: #40A070 } /* Literal.Number */
+.hl .s { color: #4070A0 } /* Literal.String */
+.hl .na { color: #4070A0 } /* Name.Attribute */
+.hl .nb { color: #007020 } /* Name.Builtin */
+.hl .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.hl .no { color: #60ADD5 } /* Name.Constant */
+.hl .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.hl .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.hl .ne { color: #007020 } /* Name.Exception */
+.hl .nf { color: #06287E } /* Name.Function */
+.hl .nl { color: #002070; font-weight: bold } /* Name.Label */
+.hl .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.hl .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.hl .nv { color: #BB60D5 } /* Name.Variable */
+.hl .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.hl .w { color: #BBB } /* Text.Whitespace */
+.hl .mb { color: #40A070 } /* Literal.Number.Bin */
+.hl .mf { color: #40A070 } /* Literal.Number.Float */
+.hl .mh { color: #40A070 } /* Literal.Number.Hex */
+.hl .mi { color: #40A070 } /* Literal.Number.Integer */
+.hl .mo { color: #40A070 } /* Literal.Number.Oct */
+.hl .sa { color: #4070A0 } /* Literal.String.Affix */
+.hl .sb { color: #4070A0 } /* Literal.String.Backtick */
+.hl .sc { color: #4070A0 } /* Literal.String.Char */
+.hl .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.hl .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.hl .s2 { color: #4070A0 } /* Literal.String.Double */
+.hl .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.hl .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.hl .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.hl .sx { color: #C65D09 } /* Literal.String.Other */
+.hl .sr { color: #235388 } /* Literal.String.Regex */
+.hl .s1 { color: #4070A0 } /* Literal.String.Single */
+.hl .ss { color: #517918 } /* Literal.String.Symbol */
+.hl .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #06287E } /* Name.Function.Magic */
+.hl .vc { color: #BB60D5 } /* Name.Variable.Class */
+.hl .vg { color: #BB60D5 } /* Name.Variable.Global */
+.hl .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.hl .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.hl .il { color: #40A070 } /* Literal.Number.Integer.Long */}
+[data-theme="dark"] .hl{pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F8F8F2 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #F8F8F2 } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #F8F8F2 } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */}
+</style>
+</head>
+<body>
+<header class="topbar">
+<button class="hamburger" aria-label="打开目录">☰</button>
+<a class="brand" href="index.html">AI 项目实战<small>从零生成、验收到持续维护</small></a>
+<div class="spacer"></div>
+<div class="searchbox">
+<input type="search" placeholder="搜索教程内容…" aria-label="搜索">
+<div class="search-results"></div>
+</div>
+<button class="theme-btn" aria-label="切换主题">🌓</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目录"><div class="group">开始</div>
+<a href="index.html" data-nav="index.html">AI 项目实战：从零生成、验收到持续维护</a>
+<div class="group">第一部分 · 建立正确的 AI 开发方式</div>
+<a href="chapters/ch01-why-projects-fail.html" data-nav="chapters/ch01-why-projects-fail.html">第 1 章　AI 能生成代码，为什么项目仍然会失败</a>
+<a href="labs/lab01-disposable-prototype.html" data-nav="labs/lab01-disposable-prototype.html">实验 1：一次性原型——生成、观察、修改、丢弃</a>
+<a href="chapters/ch02-project-basics.html" data-nav="chapters/ch02-project-basics.html">第 2 章　零基础必备：看懂项目、运行项目和阅读报错</a>
+<a href="chapters/ch03-git-safety.html" data-nav="chapters/ch03-git-safety.html">第 3 章　Git：AI 开发的安全带与时间机器</a>
+<div class="group">第二部分 · 从想法到可实施规格</div>
+<a href="chapters/ch04-intent-and-acceptance.html" data-nav="chapters/ch04-intent-and-acceptance.html">第 4 章　从想法到意图：先决定不做什么</a>
+<a href="chapters/ch05-spec-driven-development.html" data-nav="chapters/ch05-spec-driven-development.html">第 5 章　规格驱动开发：把需求写成可验证契约</a>
+<a href="chapters/ch06-architecture-and-planning.html" data-nav="chapters/ch06-architecture-and-planning.html">第 6 章　最小架构、技术决策与任务拆分</a>
+<a href="labs/lab02-project-blueprint.html" data-nav="labs/lab02-project-blueprint.html">综合实验二：不写代码，完成项目蓝图</a>
+<div class="group">第三部分 · AI 生成、验证与首次交付</div>
+<a href="chapters/ch07-vertical-slice.html" data-nav="chapters/ch07-vertical-slice.html">第 7 章　纵向打通：生成第一个真正可用的版本</a>
+<a href="chapters/ch08-small-steps-and-prs.html" data-nav="chapters/ch08-small-steps-and-prs.html">第 8 章　AI 实现闭环：小任务、小 Diff、小 PR</a>
+<a href="chapters/ch09-testing-and-debugging.html" data-nav="chapters/ch09-testing-and-debugging.html">第 9 章　测试与调试：让“AI 说完成”变成可验证事实</a>
+<a href="chapters/ch10-context-engineering.html" data-nav="chapters/ch10-context-engineering.html">第 10 章　上下文工程：让 AI 在新会话中也能接手项目</a>
+<a href="chapters/ch11-ci-release-deploy.html" data-nav="chapters/ch11-ci-release-deploy.html">第 11 章　CI、发布与部署：从本地能跑到别人能用</a>
+<a href="labs/lab03-release-v1.html" data-nav="labs/lab03-release-v1.html">综合实验三：交付第一个正式版本 v1.0</a>
+<div class="group">第四部分 · 从会生成到能长期维护</div>
+<a href="chapters/ch12-issue-driven-maintenance.html" data-nav="chapters/ch12-issue-driven-maintenance.html">第 12 章　Issue 驱动维护：从问题报告到修复 PR</a>
+<a href="chapters/ch13-change-and-refactoring.html" data-nav="chapters/ch13-change-and-refactoring.html">第 13 章　需求演化与重构：修改系统，而不是重新生成系统</a>
+<a href="chapters/ch14-legacy-modernization.html" data-nav="chapters/ch14-legacy-modernization.html">第 14 章　接手旧项目：从陌生仓库到受控现代化</a>
+<a href="chapters/ch15-data-migration-recovery.html" data-nav="chapters/ch15-data-migration-recovery.html">第 15 章　数据库迁移、备份与真正的故障恢复</a>
+<a href="chapters/ch16-long-term-maintenance.html" data-nav="chapters/ch16-long-term-maintenance.html">第 16 章　长期维护系统：依赖、安全、运行观测与文档漂移</a>
+<a href="labs/lab04-evolution-v1-1.html" data-nav="labs/lab04-evolution-v1-1.html">综合实验四：完成一次完整的需求演化（v1.1）</a>
+<a href="labs/lab05-three-month-maintenance.html" data-nav="labs/lab05-three-month-maintenance.html">综合实验五：模拟项目上线三个月</a>
+<div class="group">第五部分 · 沉淀为可复用的 AI 工程能力</div>
+<a href="chapters/ch17-skill-engineering.html" data-nav="chapters/ch17-skill-engineering.html">第 17 章　Skill 工程：把有效协作流程变成项目资产</a>
+<a href="chapters/ch18-subagents-and-automation.html" data-nav="chapters/ch18-subagents-and-automation.html">第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化</a>
+<a href="chapters/ch19-platforms-and-tool-migration.html" data-nav="chapters/ch19-platforms-and-tool-migration.html">第 19 章　平台对照与工具迁移：不被某个产品绑定</a>
+<a href="chapters/ch20-capstone.html" data-nav="chapters/ch20-capstone.html">第 20 章　结业项目：完成你自己的 AI 生成与维护闭环</a>
+<div class="group">附录</div>
+<a href="appendices/A-environment.html" data-nav="appendices/A-environment.html">附录 A　开发环境与故障速查</a>
+<a href="appendices/B-command-reference.html" data-nav="appendices/B-command-reference.html">附录 B　命令速查</a>
+<a href="appendices/C-failure-catalog.html" data-nav="appendices/C-failure-catalog.html">附录 C　故障与恢复目录</a>
+<a href="appendices/D-glossary.html" data-nav="appendices/D-glossary.html">附录 D　术语表</a>
+<a href="appendices/E-sources.html" data-nav="appendices/E-sources.html">附录 E　资料来源与核验说明</a>
+<div class="group">可复制模板</div>
+<a href="templates-intro.html" data-nav="templates-intro.html">附录 F：可复制模板原文</a>
+<a href="templates/intent.html" data-nav="templates/intent.html">项目意图（Intent）</a>
+<a href="templates/spec.html" data-nav="templates/spec.html">功能规格（Spec）</a>
+<a href="templates/plan.html" data-nav="templates/plan.html">实施计划（Plan）</a>
+<a href="templates/tasks.html" data-nav="templates/tasks.html">任务列表（Tasks）</a>
+<a href="templates/adr.html" data-nav="templates/adr.html">架构决策记录（ADR-XXXX：标题）</a>
+<a href="templates/issue.html" data-nav="templates/issue.html">Issue：[类型] 一句话描述问题或需求</a>
+<a href="templates/bug-report.html" data-nav="templates/bug-report.html">Bug 报告与诊断记录</a>
+<a href="templates/pr-checklist.html" data-nav="templates/pr-checklist.html">PR 检查清单</a>
+<a href="templates/release-checklist.html" data-nav="templates/release-checklist.html">发布检查清单（Release）</a>
+<a href="templates/runbook.html" data-nav="templates/runbook.html">运行维护手册（Runbook）</a>
+<a href="templates/handoff.html" data-nav="templates/handoff.html">会话交接文档（Handoff）</a>
+<a href="templates/definition-of-done.html" data-nav="templates/definition-of-done.html">完成定义（Definition of Done）</a></nav>
+<main class="content"><article><h1 id="5">第 5 章　规格驱动开发：把需求写成可验证契约</h1>
+<blockquote>
+<p>本章成果：把第 4 章的意图和验收标准，转化为可追踪、可测试、可供 AI 实现的行为规格与 API 契约。</p>
+</blockquote>
+<h2 id="1">1. 本章成果</h2>
+<p>完成本章后，项目中应新增以下文件：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>specs/subscription-manager/spec.md
+specs/subscription-manager/api.md
+specs/subscription-manager/scenarios.md
+docs/spec-traceability.md
+</code></pre></div></div>
+
+<p>这些文件共同构成第一版规格：</p>
+<ul>
+<li><code>spec.md</code>：定义系统必须满足的行为、数据规则、状态码和阶段范围。</li>
+<li><code>api.md</code>：定义核心 HTTP 接口、请求示例、响应示例和错误契约。</li>
+<li><code>scenarios.md</code>：把关键行为写成可转成测试的 Given/When/Then 场景。</li>
+<li><code>spec-traceability.md</code>：记录 Intent、Acceptance、Spec 和后续任务之间的对应关系。</li>
+</ul>
+<p>本章仍然不生成应用代码。规格完成并通过审查后，第 6 章才开始设计架构和任务。</p>
+<h2 id="2">2. 为什么需要它</h2>
+<p>Intent 说明“为什么做”，Spec 说明“系统应表现出什么行为”。没有 Spec 时，AI 每一轮都可能重新猜测边界条件：空名称是否允许？金额是元还是分？删除不存在的记录返回什么？列表按什么排序？这些猜测会分散到代码、测试和文档中，后期很难统一。</p>
+<p>规格驱动开发（Spec-Driven Development，SDD）的价值，是在实现前形成一份人和 AI 都能审查的契约。它不是为了增加仪式感，而是解决三个问题：</p>
+<ol>
+<li><strong>可验收</strong>：每条需求都能变成测试或明确的手工检查。</li>
+<li><strong>可追踪</strong>：代码和任务可以回链到具体需求。</li>
+<li><strong>可演化</strong>：后续改需求时，先改 Spec，再改代码，而不是直接在聊天记录里临时决定。</li>
+</ol>
+<h3 id="spec-kit-openspec">Spec Kit 与 OpenSpec 的主辅关系</h3>
+<p>本教程把<strong>仓库内的 Markdown 规格文件作为唯一事实源</strong>。工具可以辅助生成和组织这些文件，但不能替代人工审查。</p>
+<p><a href="https://github.com/github/spec-kit">github/spec-kit</a> 适合作为主参考流程。它把开发拆成若干阶段，例如建立项目原则、编写规格、澄清歧义、制定计划、拆分任务、分析一致性并实现。初学者可以借用它的阶段意识，但不必一开始就执行全部命令。</p>
+<p><a href="https://github.com/Fission-AI/OpenSpec">Fission-AI/OpenSpec</a> 更轻量，适合作为辅助对照，尤其适合后续“提出变更、审查差异、归档决定”的演化场景。它强调用变更提案管理规格，而不是把所有讨论都堆在一份大文档里。</p>
+<p>教程中的使用原则是：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>在教程中的角色</th>
+<th>使用方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>手写 Markdown 规格</td>
+<td>主线</td>
+<td><code>specs/subscription-manager/</code> 下的文件是最终事实源</td>
+</tr>
+<tr>
+<td>Spec Kit</td>
+<td>主流程参考</td>
+<td>借用阶段划分和澄清思路；工具输出必须经过人工审查后纳入仓库规格</td>
+</tr>
+<tr>
+<td>OpenSpec</td>
+<td>轻量变更辅助</td>
+<td>后续需求变更时作为对照方法，不与 Spec Kit 同时管理同一份规格状态</td>
+</tr>
+</tbody>
+</table>
+<p>不要在一个项目里同时初始化两套流程并各自生成规格文件。否则会出现两份“看起来都对”的规格，AI 和新读者都不知道该相信哪一份。具体安装命令会随版本变化，本教程不在正文堆砌命令；需要时以官方 README 和当前版本为准。</p>
+<h2 id="3">3. 最少必备知识</h2>
+<ul>
+<li><strong>需求 ID</strong>：例如 <code>SUB-001</code>，用于让测试、任务和代码引用同一条行为。</li>
+<li><strong>MUST / SHOULD / MAY</strong>：分别表示必须满足、建议满足和可选行为。第一版应谨慎使用 SHOULD 和 MAY。</li>
+<li><strong>正常路径与异常路径</strong>：成功创建是一条路径；无效输入、记录不存在、数据库不可写是另一些路径。</li>
+<li><strong>API 契约</strong>：路径、方法、请求字段、响应字段、状态码和错误格式。</li>
+<li><strong>验收场景</strong>：用 Given/When/Then 描述前置条件、操作和可观察结果。</li>
+<li><strong>规格追踪</strong>：Intent → Acceptance → Spec → Task → Test 的对应关系。</li>
+<li><strong>Spec Delta</strong>：后续只描述规格变化的部分，而不是每次重写整份文档。</li>
+</ul>
+<h2 id="4">4. 起始项目状态</h2>
+<p>确认第 4 章文档已经提交：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">status</span>
+<span class="n">git</span> <span class="k">switch</span> <span class="n">-c</span> <span class="n">docs</span><span class="p">/</span><span class="n">specification</span>
+</code></pre></div></div>
+
+<p>当前项目应至少有：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>docs/intent.md
+docs/acceptance.md
+README.md
+AGENTS.md
+</code></pre></div></div>
+
+<p>如果还没有 <code>specs/</code> 目录，本章会创建它。不要在本章创建 <code>app/</code>、<code>tests/</code> 或数据库文件。</p>
+<h2 id="5-ai">5. 操作步骤与 AI 任务示例</h2>
+<h3 id="51">5.1 从验收标准反推规格</h3>
+<p>规格不是重新写一遍愿望，而是把每条 Acceptance 转成系统行为。使用以下 AI 任务：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：基于现有 Intent 和 Acceptance，为 Subscription Tracker 编写第一版行为规格与 API 契约。
+
+上下文：
+- 请阅读 `docs/intent.md`、`docs/acceptance.md`。
+- 项目是本地单用户应用，使用 Python 3.12+、FastAPI、SQLite 和原生前端。
+- 初始字段为 id、name、amount、currency、renewal_date、note、created_at。
+- 金额使用“分”为单位的正整数。
+- 核心 API 是 `/api/subscriptions`，健康检查是 `/health`。
+- v0.1 只做添加、查看和持久化；v0.2 做修改、删除和完整校验；v1.0 做 CSV 导出、测试、CI 和发布。
+
+范围：
+- 只生成规格、API 契约、验收场景和追踪表。
+- 不生成 Python 代码、前端代码、测试代码或 CI 配置。
+- 不设计登录、提醒、邮箱抓取、汇率换算或多用户功能。
+
+约束：
+- 每条行为需求必须有唯一 ID。
+- 每条需求必须标明所属版本阶段。
+- 每个字段必须写清类型、是否必填、默认值和边界。
+- 每个 API 必须写清方法、路径、成功状态码、失败状态码和示例。
+- 不要复制 Intent 原文来充数；Spec 必须描述可测试行为。
+
+验收：
+- AC-01 到 AC-08 都能追踪到至少一条 Spec 需求。
+- 正常、无效输入、记录不存在和持久化场景均有明确预期。
+- API 示例中的字段名、类型和阶段范围保持一致。
+
+输出：
+1. `specs/subscription-manager/spec.md`
+2. `specs/subscription-manager/api.md`
+3. `specs/subscription-manager/scenarios.md`
+4. `docs/spec-traceability.md`
+5. 规格中仍存在、需要我决定的开放问题清单
+</code></pre></div></div>
+
+<h3 id="52-specssubscription-managerspecmd">5.2 编写 <code>specs/subscription-manager/spec.md</code></h3>
+<p>以下示例可直接作为起点。它刻意不规定函数名、类名和目录结构，只规定外部可验证行为。</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gh"># Subscription Tracker Specification</span>
+
+<span class="gu">## 1. 范围</span>
+
+本规格覆盖本地单用户订阅管理器的 v0.1、v0.2 和 v1.0 行为。登录、权限、自动提醒、邮箱抓取、汇率换算、支付集成和多设备同步不在范围内。
+
+<span class="gu">## 2. 数据规则</span>
+
+| 字段 | 类型 | 必填 | 规则 |
+|---|---|---|---|
+| <span class="sb">`id`</span> | integer | 服务端生成 | 数据库主键，创建后不可由客户端指定或修改 |
+| <span class="sb">`name`</span> | string | 是 | 去除首尾空白后长度为 1—80 |
+| <span class="sb">`amount`</span> | integer | 是 | 以“分”为单位，必须大于 0；`1200` 表示 12.00 |
+| <span class="sb">`currency`</span> | string | 是 | 只能是 <span class="sb">`CNY`</span> 或 <span class="sb">`USD`</span> |
+| <span class="sb">`renewal_date`</span> | string | 是 | ISO 8601 日期，格式 <span class="sb">`YYYY-MM-DD`</span>，必须是有效日期 |
+| <span class="sb">`note`</span> | string | 否 | 最长 500 字符；缺省为空字符串 |
+| <span class="sb">`created_at`</span> | string | 服务端生成 | UTC ISO 8601 时间戳，创建后不可修改 |
+
+<span class="gu">## 3. 行为需求</span>
+
+<span class="gu">### SUB-001　创建订阅（v0.1）</span>
+
+系统 MUST 允许用户提交一条有效订阅记录。创建成功后，系统 MUST 返回包含服务端生成 <span class="sb">`id`</span> 和 <span class="sb">`created_at`</span> 的完整记录。
+
+<span class="gu">### SUB-002　查看订阅列表（v0.1）</span>
+
+系统 MUST 返回所有订阅记录。列表 MUST 按 <span class="sb">`renewal_date`</span> 升序排序；日期相同时按 <span class="sb">`id`</span> 升序排序。
+
+<span class="gu">### SUB-003　持久化（v0.1）</span>
+
+成功创建的订阅 MUST 保存在 SQLite 数据库中。应用停止并重新启动后，数据 MUST 仍然存在且字段值不变。
+
+<span class="gu">### SUB-004　输入校验（v0.2）</span>
+
+系统 MUST 拒绝无效输入，包括：空名称、超长名称、非正整数金额、不支持的货币、无效日期、超长备注。校验失败时 MUST NOT 写入数据库。
+
+<span class="gu">### SUB-005　更新订阅（v0.2）</span>
+
+系统 MUST 允许根据 <span class="sb">`id`</span> 更新 <span class="sb">`name`</span>、<span class="sb">`amount`</span>、<span class="sb">`currency`</span>、<span class="sb">`renewal_date`</span> 和 <span class="sb">`note`</span>。更新成功后，后续查询 MUST 返回新值。`id` 和 <span class="sb">`created_at`</span> MUST NOT 被客户端修改。
+
+<span class="gu">### SUB-006　删除订阅（v0.2）</span>
+
+系统 MUST 允许根据 <span class="sb">`id`</span> 删除订阅。删除成功后，该记录 MUST NOT 出现在列表或 CSV 导出中。删除不存在的记录 MUST 返回 404。
+
+<span class="gu">### SUB-007　CSV 导出（v1.0）</span>
+
+系统 MUST 提供 UTF-8 CSV 导出。导出内容 MUST 包含当前所有订阅，字段顺序固定为：
+
+<span class="sb">```text</span>
+id,name,amount,currency,renewal_date,note,created_at
+<span class="sb">```</span>
+
+CSV 中的 <span class="sb">`amount`</span> 仍为分单位整数。包含逗号、引号或换行的字段 MUST 按 CSV 规则正确转义。
+
+<span class="gu">### OPS-001　健康检查（v0.1）</span>
+
+系统 MUST 提供 <span class="sb">`GET /health`</span>。服务可正常处理请求时，MUST 返回 HTTP 200 和 JSON 对象 <span class="sb">`{&quot;status&quot;: &quot;ok&quot;}`</span>。
+
+<span class="gu">## 4. 非功能需求</span>
+
+<span class="k">-</span><span class="w"> </span>NFR-001：项目 MUST 能从干净 Git 工作副本安装依赖并启动。
+<span class="k">-</span><span class="w"> </span>NFR-002：核心行为 MUST 能由自动化测试覆盖。
+<span class="k">-</span><span class="w"> </span>NFR-003：应用 MUST NOT 依赖外部付费服务、邮箱账号或支付平台。
+<span class="k">-</span><span class="w"> </span>NFR-004：错误信息 SHOULD 指出字段和原因，但 MUST NOT 泄露数据库文件路径、密钥或完整堆栈给普通页面用户。
+<span class="k">-</span><span class="w"> </span>NFR-005：文档与规格 MUST 与已发布版本保持可追踪关系。
+
+<span class="gu">## 5. 开放问题</span>
+
+<span class="k">-</span><span class="w"> </span>OQ-001：CSV 是否需要包含可读金额列？当前决定：只导出 <span class="sb">`amount`</span> 分单位整数，避免两种金额来源。
+<span class="k">-</span><span class="w"> </span>OQ-002：是否允许过去日期？当前决定：允许，因为用户可能补录历史订阅。
+<span class="k">-</span><span class="w"> </span>OQ-003：是否提供分页？当前决定：v1.0 不提供分页，数据量为个人本地使用规模。
+</code></pre></div></div>
+
+<h3 id="53-specssubscription-managerapimd">5.3 编写 <code>specs/subscription-manager/api.md</code></h3>
+<p>API 契约应稳定到足以支撑测试，但不必提前绑定框架内部错误对象的每个字段。</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gh"># Subscription Tracker API</span>
+
+<span class="gu">## 基础约定</span>
+
+<span class="k">-</span><span class="w"> </span>Base URL：`http://127.0.0.1:8000`
+<span class="k">-</span><span class="w"> </span>请求与响应默认使用 <span class="sb">`application/json; charset=utf-8`</span>。
+<span class="k">-</span><span class="w"> </span>CSV 导出使用 <span class="sb">`text/csv; charset=utf-8`</span>。
+<span class="k">-</span><span class="w"> </span>所有时间戳使用 UTC ISO 8601。
+<span class="k">-</span><span class="w"> </span><span class="sb">`id`</span> 和 <span class="sb">`created_at`</span> 由服务端生成，客户端不得指定。
+
+<span class="gu">## 1. 健康检查</span>
+
+<span class="sb">```http</span>
+<span class="err">GET /health</span>
+<span class="sb">```</span>
+
+成功响应：
+
+<span class="sb">```json</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span>
+<span class="p">}</span>
+<span class="sb">```</span>
+
+<span class="gu">## 2. 创建订阅</span>
+
+<span class="sb">```http</span>
+<span class="err">POST /api/subscriptions</span>
+<span class="sb">```</span>
+
+请求示例：
+
+<span class="sb">```json</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Cloud&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1200</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNY&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;renewal_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2027-01-15&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;note&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;个人存储空间&quot;</span>
+<span class="p">}</span>
+<span class="sb">```</span>
+
+成功响应：`201 Created`
+
+<span class="sb">```json</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Cloud&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1200</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNY&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;renewal_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2027-01-15&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;note&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;个人存储空间&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-11-24T00:00:00Z&quot;</span>
+<span class="p">}</span>
+<span class="sb">```</span>
+
+失败响应：`422 Unprocessable Entity`
+
+当请求体缺少字段或字段不满足数据规则时，响应 MUST 标识出错字段和原因。具体 JSON 结构可沿用框架默认校验格式，但必须由测试固定，避免后续随机变化。
+
+<span class="gu">## 3. 查看订阅列表</span>
+
+<span class="sb">```http</span>
+<span class="err">GET /api/subscriptions</span>
+<span class="sb">```</span>
+
+成功响应：`200 OK`
+
+<span class="sb">```json</span>
+<span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Cloud&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1200</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNY&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;renewal_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2027-01-15&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;note&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;个人存储空间&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-11-24T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Domain Renewal&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8800</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNY&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;renewal_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2027-03-01&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;note&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-11-24T00:05:00Z&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+<span class="sb">```</span>
+
+排序规则：`renewal_date` 升序；相同日期按 <span class="sb">`id`</span> 升序。
+
+<span class="gu">## 4. 更新订阅</span>
+
+<span class="sb">```http</span>
+<span class="err">PUT /api/subscriptions/{id}</span>
+<span class="sb">```</span>
+
+请求示例：
+
+<span class="sb">```json</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Cloud Pro&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2400</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNY&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;renewal_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2027-01-15&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;note&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;已升级存储空间&quot;</span>
+<span class="p">}</span>
+<span class="sb">```</span>
+
+成功响应：`200 OK`，返回更新后的完整记录。  
+记录不存在：`404 Not Found`
+
+<span class="sb">```json</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Subscription not found&quot;</span>
+<span class="p">}</span>
+<span class="sb">```</span>
+
+<span class="gu">## 5. 删除订阅</span>
+
+<span class="sb">```http</span>
+<span class="err">DELETE /api/subscriptions/{id}</span>
+<span class="sb">```</span>
+
+成功响应：`204 No Content`  
+记录不存在：`404 Not Found`
+
+<span class="gu">## 6. CSV 导出</span>
+
+<span class="sb">```http</span>
+<span class="err">GET /api/subscriptions/export.csv</span>
+<span class="sb">```</span>
+
+成功响应：`200 OK`
+
+响应头应包含：
+
+<span class="sb">```http</span>
+<span class="err">Content-Type: text/csv; charset=utf-8</span>
+<span class="sb">```</span>
+
+响应体示例：
+
+<span class="sb">```csv</span>
+<span class="s">id,name,amount,currency,renewal_date,note,created_at</span>
+<span class="s">1,Example Cloud,1200,CNY,2027-01-15,个人存储空间,2026-11-24T00:00:00Z</span>
+<span class="s">2,&quot;Domain, Renewal&quot;,8800,CNY,2027-03-01,,2026-11-24T00:05:00Z</span>
+<span class="sb">```</span>
+</code></pre></div></div>
+
+<h3 id="54-specssubscription-managerscenariosmd">5.4 编写 <code>specs/subscription-manager/scenarios.md</code></h3>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gh"># Subscription Tracker Scenarios</span>
+
+<span class="gu">## SC-001　创建有效订阅</span>
+
+Given 应用已启动且数据库中没有订阅  
+When 提交 <span class="sb">`name=&quot;Example Cloud&quot;`</span>、<span class="sb">`amount=1200`</span>、<span class="sb">`currency=&quot;CNY&quot;`</span>、<span class="sb">`renewal_date=&quot;2027-01-15&quot;`</span>  
+Then 创建请求返回 201  
+And 返回记录包含服务端生成的 <span class="sb">`id`</span> 和 <span class="sb">`created_at`</span>  
+And 列表请求返回 1 条记录
+
+<span class="gu">## SC-002　拒绝无效金额</span>
+
+Given 用户正在创建订阅  
+When <span class="sb">`amount=0`</span> 或 <span class="sb">`amount=-100`</span> 或 <span class="sb">`amount=12.5`</span>  
+Then 请求返回 422  
+And 数据库中的订阅数量不变
+
+<span class="gu">## SC-003　拒绝无效货币和日期</span>
+
+Given 用户正在创建订阅  
+When <span class="sb">`currency=&quot;RMB&quot;`</span> 或 <span class="sb">`renewal_date=&quot;2027-13-40&quot;`</span>  
+Then 请求返回 422  
+And 错误信息标识对应字段  
+And 数据库中的订阅数量不变
+
+<span class="gu">## SC-004　列表排序</span>
+
+Given 数据库中存在续费日期分别为 <span class="sb">`2027-03-01`</span>、<span class="sb">`2027-01-15`</span>、<span class="sb">`2027-01-15`</span> 的三条订阅  
+When 请求订阅列表  
+Then 返回顺序按日期升序排列  
+And 日期相同的两条记录按 <span class="sb">`id`</span> 升序排列
+
+<span class="gu">## SC-005　更新不存在的订阅</span>
+
+Given 数据库中不存在 <span class="sb">`id=999`</span> 的订阅  
+When 对 <span class="sb">`/api/subscriptions/999`</span> 发起更新请求  
+Then 返回 404  
+And 数据库内容不变
+
+<span class="gu">## SC-006　删除后不再导出</span>
+
+Given 数据库中存在两条订阅  
+When 删除其中一条并请求 CSV 导出  
+Then CSV 只包含剩余一条数据记录  
+And 表头字段顺序保持不变
+
+<span class="gu">## SC-007　重启后数据保留</span>
+
+Given 已成功创建一条订阅  
+When 停止应用、重新启动应用并请求列表  
+Then 该订阅仍存在  
+And <span class="sb">`id`</span>、<span class="sb">`amount`</span>、<span class="sb">`currency`</span>、<span class="sb">`renewal_date`</span> 和 <span class="sb">`created_at`</span> 均未变化
+</code></pre></div></div>
+
+<h3 id="55">5.5 建立追踪表</h3>
+<p>新建 <code>docs/spec-traceability.md</code>：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gh"># Spec Traceability</span>
+
+| Intent | Acceptance | Spec | Scenario | 计划任务 | 测试 |
+|---|---|---|---|---|---|
+| G1 记录订阅 | AC-01、AC-02、AC-04 | SUB-001、SUB-003、SUB-004 | SC-001、SC-002、SC-003、SC-007 | 第 6 章拆分 | 待补 |
+| G2 查看列表 | AC-03 | SUB-002 | SC-004 | 第 6 章拆分 | 待补 |
+| G3 修改或删除 | AC-05、AC-06 | SUB-005、SUB-006 | SC-005、SC-006 | 第 6 章拆分 | 待补 |
+| G4 导出 CSV | AC-07 | SUB-007 | SC-006 | 第 6 章拆分 | 待补 |
+| G5 可维护交付 | AC-08 | NFR-001、NFR-002、OPS-001 | 待补 | 第 6 章拆分 | 待补 |
+</code></pre></div></div>
+
+<p>“计划任务”和“测试”两列在第 6 章和第 9 章逐步填写。规格阶段允许它们为空，但不允许 Intent 或 Acceptance 找不到对应 Spec。</p>
+<h3 id="56">5.6 独立澄清审查</h3>
+<p>开启新的 AI 会话，执行只读审查：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：检查 Subscription Tracker 规格是否存在歧义、矛盾或不可测试内容。
+
+上下文：
+- 请阅读 `docs/intent.md`、`docs/acceptance.md`、`specs/subscription-manager/spec.md`、`specs/subscription-manager/api.md`、`specs/subscription-manager/scenarios.md` 和 `docs/spec-traceability.md`。
+- 项目是本地单用户应用，不包含登录、提醒、邮箱抓取、汇率换算和支付功能。
+
+范围：
+- 只审查规格，不修改文件，不生成实现代码。
+- 重点检查字段规则、状态码、排序、持久化、CSV、错误处理和追踪表。
+
+约束：
+- 每条问题必须引用文件和需求 ID。
+- 区分 blocker、major、minor。
+- 不要建议扩大 v1.0 范围。
+
+验收：
+- 找出无法转成测试的描述。
+- 找出 API 与 Spec 不一致之处。
+- 找出 Acceptance 未覆盖或重复覆盖的情况。
+
+输出：
+1. 问题清单；
+2. 每条问题的最小修改建议；
+3. 是否可以进入架构与规划阶段的结论。
+</code></pre></div></div>
+
+<h2 id="6-ai">6. AI 应生成的产物</h2>
+<p>合理产物：</p>
+<ul>
+<li>行为规格；</li>
+<li>API 契约；</li>
+<li>Given/When/Then 场景；</li>
+<li>追踪表；</li>
+<li>开放问题和独立审查报告。</li>
+</ul>
+<p>不合理产物：</p>
+<ul>
+<li>Python 路由、数据库模型或 Pydantic Schema 代码；</li>
+<li>前端 HTML/CSS/JavaScript；</li>
+<li>pytest 测试代码；</li>
+<li>CI 配置；</li>
+<li>具体函数名、类名和目录设计。</li>
+</ul>
+<p>如果 AI 顺手写出了实现代码，应把它移到第 7 章之后，或放入临时草稿，不要提交到规格分支。</p>
+<h2 id="7">7. 人工检查点</h2>
+<ol>
+<li><strong>追踪是否闭合？</strong><br />
+   从每个 <code>Gx</code> 找到 <code>AC-xx</code>，再找到 <code>SUB-xxx</code> 或 <code>OPS-xxx</code>。任何断链都要补规格或删目标。</li>
+<li><strong>字段规则是否唯一？</strong><br />
+<code>amount</code> 全篇必须都是分单位整数；<code>currency</code> 全篇只能是 <code>CNY</code> 和 <code>USD</code>；<code>renewal_date</code> 全篇必须是 <code>YYYY-MM-DD</code>。</li>
+<li><strong>状态码是否一致？</strong><br />
+   创建成功是 201，更新成功是 200，删除成功是 204，不存在是 404，校验失败是 422。不要在同一接口中混用 200 和 201。</li>
+<li><strong>阶段是否明确？</strong><br />
+   v0.1 不应包含完整校验、更新、删除和 CSV 导出。规格可以提前写清楚，但任务计划必须分阶段实现。</li>
+<li><strong>异常路径是否足够？</strong><br />
+   至少检查空名称、0 或负金额、非整数金额、不支持货币、无效日期、更新不存在记录和删除不存在记录。</li>
+<li><strong>是否过度设计？</strong><br />
+   分页、缓存、软删除、国际化、权限、报表和消息队列都不应出现在第一版规格中，除非 Intent 明确要求。</li>
+</ol>
+<h2 id="8">8. 验收命令与通过标准</h2>
+<p>运行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">status</span> <span class="p">-</span><span class="n">-short</span>
+<span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-check</span>
+<span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-name-only</span>
+</code></pre></div></div>
+
+<p>通过标准：</p>
+<ul>
+<li>新增文件只包含规格、API、场景、追踪表和本章说明允许的文档。</li>
+<li><code>spec-traceability.md</code> 中每个 Intent 都有至少一条 Spec。</li>
+<li>AC-01 到 AC-08 都能对应到 Spec 或明确标记为后续阶段。</li>
+<li>API 示例字段与数据规则表完全一致。</li>
+<li>每个正常路径至少有一个异常路径。</li>
+<li>没有生成应用代码、测试代码或 CI 配置。</li>
+</ul>
+<p>本章的“通过”不是 AI 说规格完整，而是追踪表闭合且人工确认字段、状态码和阶段没有冲突。</p>
+<h2 id="9">9. 常见失败及恢复方法</h2>
+<table>
+<thead>
+<tr>
+<th>症状</th>
+<th>原因</th>
+<th>恢复动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spec 写满“高效、稳定、安全、易用”，但无法测试</td>
+<td>把质量愿望当成行为需求</td>
+<td>删除主观描述，改写成具体输入、操作、状态码和数据变化</td>
+</tr>
+<tr>
+<td>API 中出现 <code>price</code>，Spec 中却叫 <code>amount</code></td>
+<td>工具或 AI 在不同段落自行改名</td>
+<td>以数据规则表为准，全文统一字段名，并用追踪表检查所有示例</td>
+</tr>
+<tr>
+<td>Spec 同时规定类名、函数名、目录和数据库表结构</td>
+<td>把第 6 章架构决策提前写入行为契约</td>
+<td>将实现细节移到架构草稿；Spec 只保留外部行为和必要约束</td>
+</tr>
+<tr>
+<td>Spec Kit、OpenSpec 和手写规格同时存在三份文档</td>
+<td>多工具并行管理同一状态</td>
+<td>选择仓库内 <code>specs/subscription-manager/</code> 作为唯一事实源，其他工具输出仅作为审查草稿</td>
+</tr>
+<tr>
+<td>只写成功创建，不写无效输入和 404</td>
+<td>忽略异常路径</td>
+<td>按字段逐个补校验场景，并为更新/删除补记录不存在场景</td>
+</tr>
+<tr>
+<td>后续代码改了行为，但规格没有更新</td>
+<td>把规格当一次性文档</td>
+<td>先提交 Spec Delta，再修改代码；追踪表中记录变更原因</td>
+</tr>
+</tbody>
+</table>
+<p>如果规格文件已经混乱，不要逐行修补。可以恢复到本章起点后重做：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="k">switch</span> <span class="n">docs</span><span class="p">/</span><span class="n">intent</span><span class="o">-and</span><span class="n">-acceptance</span>
+<span class="n">git</span> <span class="k">switch</span> <span class="n">-c</span> <span class="n">docs</span><span class="p">/</span><span class="n">specification-retry</span>
+</code></pre></div></div>
+
+<h2 id="10-git">10. 本章 Git 提交</h2>
+<p>建议分支：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>docs/specification
+</code></pre></div></div>
+
+<p>建议提交拆分：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">add</span> <span class="n">specs</span><span class="p">/</span><span class="n">subscription-manager</span><span class="p">/</span><span class="n">spec</span><span class="p">.</span><span class="nb">md</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;docs: add subscription behavior specification&quot;</span>
+
+<span class="n">git</span> <span class="n">add</span> <span class="n">specs</span><span class="p">/</span><span class="n">subscription-manager</span><span class="p">/</span><span class="n">api</span><span class="p">.</span><span class="nb">md</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;docs: define subscription API contract&quot;</span>
+
+<span class="n">git</span> <span class="n">add</span> <span class="n">specs</span><span class="p">/</span><span class="n">subscription-manager</span><span class="p">/</span><span class="n">scenarios</span><span class="p">.</span><span class="nb">md</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;docs: add acceptance scenarios&quot;</span>
+
+<span class="n">git</span> <span class="n">add</span> <span class="n">docs</span><span class="p">/</span><span class="n">spec-traceability</span><span class="p">.</span><span class="nb">md</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;docs: trace intent and acceptance to spec&quot;</span>
+</code></pre></div></div>
+
+<p>每次提交前查看：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-staged</span> <span class="p">-</span><span class="n">-stat</span>
+<span class="n">git</span> <span class="nb">diff </span><span class="p">-</span><span class="n">-staged</span>
+</code></pre></div></div>
+
+<p>如果发现应用代码混入暂存区，使用：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">restore</span> <span class="p">-</span><span class="n">-staged</span> <span class="n">PATH</span>
+</code></pre></div></div>
+
+<h2 id="11">11. 练习与扩展</h2>
+<ol>
+<li><strong>新增货币</strong>：把 <code>currency</code> 扩展为支持 <code>EUR</code>，写一份只包含变更内容的 Spec Delta，不要重写整份规格。</li>
+<li><strong>增加分页</strong>：为列表 API 设计 <code>limit</code> 和 <code>offset</code>，并说明默认值、最大值、越界行为和排序稳定性。</li>
+<li><strong>补充搜索规格</strong>：为 v1.1 的搜索筛选功能写规格，但不实现代码。</li>
+<li><strong>工具对照</strong>：阅读 Spec Kit 的阶段说明和 OpenSpec 的变更说明，用 200 字写出两者分别适合什么项目阶段。</li>
+<li><strong>反向追踪</strong>：从 <code>SC-006</code> 反查它覆盖了哪些 Acceptance、Spec 和 Intent；如果查不到，说明追踪表有断链。</li>
+</ol>
+<h2 id="12">12. 参考资料</h2>
+<ul>
+<li><a href="https://github.com/github/spec-kit">github/spec-kit</a></li>
+<li><a href="https://github.com/github/spec-kit/blob/main/docs/reference/agentic-sdd.html">Spec Kit agentic SDD reference</a></li>
+<li><a href="https://github.com/Fission-AI/OpenSpec">Fission-AI/OpenSpec</a></li>
+<li><a href="https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html">Understanding Spec-Driven-Development: Kiro, spec-kit, and Tessl</a></li>
+<li><a href="https://jyywiki.cn/GSE/2026/lect6.html">需求和架构（GSE 2026 第 6 讲）</a></li>
+</ul></article><nav class="pagenav"><a href="chapters/ch04-intent-and-acceptance.html"><small>← 上一篇</small>第 4 章　从想法到意图：先决定不做什么</a><a class="next" href="chapters/ch06-architecture-and-planning.html"><small>下一篇 →</small>第 6 章　最小架构、技术决策与任务拆分</a></nav></main>
+</div>
+<footer>AI 项目实战 · 从零生成、验收到持续维护 · 由纯静态 HTML 生成，可部署到 Cloudflare Pages / GitHub Pages</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 1 章　AI 能生成代码，为什么项目仍然会失败 · AI 项目实战</title>
+<script>(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
+</script>
+<style>:root{--bg:#faf9f7;--surface:#fff;--sidebar:#f3f2ee;--text:#1f2328;--text-2:#57606a;--border:#e4e2dc;--accent:#4f46e5;--accent-2:#7c3aed;--radius:10px;--shadow:0 1px 3px rgb(0 0 0/.08);--font-sans:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--font-mono:"Cascadia Code",Consolas,"JetBrains Mono",monospace}
+[data-theme="dark"]{--bg:#101014;--surface:#18181f;--sidebar:#14141a;--text:#e6e6ea;--text-2:#9a9aa5;--border:#2a2a33;--accent:#818cf8;--accent-2:#a78bfa;--shadow:0 1px 3px rgb(0 0 0/.4)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 var(--font-sans)}
+a{color:var(--accent);text-decoration:none;transition:.15s ease}a:hover{text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 20px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topbar .brand{font-weight:700;font-size:1.05rem;color:var(--text);white-space:nowrap}
+.topbar .brand small{color:var(--text-2);font-weight:400;margin-left:8px}
+.topbar .spacer{flex:1}
+.searchbox{position:relative;width:min(320px,40vw)}
+.searchbox input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text);font:inherit}
+.searchbox input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.search-results{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);max-height:340px;overflow:auto;display:none}
+.search-results a{display:block;padding:8px 14px;color:var(--text);border-bottom:1px solid var(--border)}
+.search-results a:last-child{border-bottom:0}
+.search-results a b{color:var(--accent)}
+.search-results a small{display:block;color:var(--text-2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-empty{padding:10px 14px;color:var(--text-2);font-size:.9rem}
+.theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit}
+.theme-btn:hover{border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;align-items:start}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;padding:18px 14px 40px;background:var(--sidebar);border-right:1px solid var(--border)}
+.sidebar .group{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin:18px 10px 6px;font-weight:600}
+.sidebar a{display:block;padding:6px 10px;border-radius:8px;color:var(--text);font-size:.92rem;line-height:1.5;border-left:3px solid transparent;margin:1px 0}
+.sidebar a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);text-decoration:none}
+.sidebar a.active{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.content{padding:36px 32px 80px;min-width:0}
+article{max-width:76ch;margin:0 auto;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+article h1{font-size:1.9rem;line-height:1.35;margin:0 0 .8em}
+article h2{font-size:1.4rem;margin:2em 0 .6em;padding-bottom:.3em;border-bottom:1px solid var(--border)}
+article h3{font-size:1.15rem;margin:1.6em 0 .5em}
+article h4{font-size:1rem;margin:1.4em 0 .4em}
+article p{text-align:justify;margin:.9em 0}
+article ul,article ol{padding-left:1.6em;margin:.8em 0}
+article li{margin:.35em 0}
+article blockquote{margin:1.2em 0;padding:.8em 1.1em;background:var(--surface);border-left:3px solid var(--accent);border-radius:var(--radius);color:var(--text-2)}
+article blockquote p{margin:.3em 0;text-align:left}
+article hr{border:0;border-top:1px solid var(--border);margin:2em 0}
+article img{max-width:100%;border-radius:var(--radius)}
+code{font-family:var(--font-mono);font-size:.9em;background:color-mix(in srgb,var(--accent) 10%,transparent);padding:.15em .4em;border-radius:5px}
+pre{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1em 1.1em;overflow:auto;font-size:.88rem;line-height:1.6;margin:1.1em 0}
+pre code{background:none;padding:0}
+.code-wrap{position:relative;margin:1.1em 0}
+.code-wrap pre{margin:0}
+.copy-btn{position:absolute;top:8px;right:8px;z-index:2;border:1px solid var(--border);background:var(--bg);color:var(--text-2);border-radius:6px;padding:3px 9px;font-size:.75rem;cursor:pointer;opacity:0;transition:.15s ease;font-family:var(--font-sans)}
+.code-wrap:hover .copy-btn{opacity:1}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:#16a34a;border-color:#16a34a;opacity:1}
+.tbl-wrap{overflow:auto;margin:1.2em 0}
+article table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface);border-radius:var(--radius)}
+article th{background:var(--sidebar);font-weight:600;text-align:left}
+article th,article td{border:1px solid var(--border);padding:.5em .75em}
+article tbody tr:nth-child(even){background:color-mix(in srgb,var(--sidebar) 55%,transparent)}
+.pagenav{display:flex;justify-content:space-between;gap:12px;margin-top:3em;padding-top:1.2em;border-top:1px solid var(--border)}
+.pagenav a{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:46%}
+.pagenav a small{display:block;color:var(--text-2);font-size:.78rem}
+.pagenav a.next{text-align:right;margin-left:auto}
+footer{padding:26px 20px;color:var(--text-2);font-size:.85rem;text-align:center;border-top:1px solid var(--border)}
+.hamburger{display:none;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;color:var(--text)}
+@media (max-width:900px){
+.layout{display:block}
+.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;width:280px;transform:translateX(-100%);transition:transform .2s ease;height:100vh;border-right:1px solid var(--border)}
+.sidebar.open{transform:none;box-shadow:0 0 40px rgb(0 0 0/.25)}
+.hamburger{display:inline-block}
+.content{padding:24px 18px 60px}
+.searchbox{width:min(200px,38vw)}
+}
+@media print{.topbar,.sidebar,.pagenav,.copy-btn{display:none!important}.layout{display:block}.content{padding:0}.article,article{max-width:none}}
+.hl{background:transparent}
+:root:not([data-theme="dark"]) .hl{pre { line-height: 125%; }
+td.linenos .normal { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #666666; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #ffffcc }
+.hl { background: #f0f0f0; }
+.hl .c { color: #60A0B0; font-style: italic } /* Comment */
+.hl .err { border: 1px solid #F00 } /* Error */
+.hl .k { color: #007020; font-weight: bold } /* Keyword */
+.hl .o { color: #666 } /* Operator */
+.hl .ch { color: #60A0B0; font-style: italic } /* Comment.Hashbang */
+.hl .cm { color: #60A0B0; font-style: italic } /* Comment.Multiline */
+.hl .cp { color: #007020 } /* Comment.Preproc */
+.hl .cpf { color: #60A0B0; font-style: italic } /* Comment.PreprocFile */
+.hl .c1 { color: #60A0B0; font-style: italic } /* Comment.Single */
+.hl .cs { color: #60A0B0; background-color: #FFF0F0 } /* Comment.Special */
+.hl .gd { color: #A00000 } /* Generic.Deleted */
+.hl .ge { font-style: italic } /* Generic.Emph */
+.hl .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F00 } /* Generic.Error */
+.hl .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.hl .gi { color: #00A000 } /* Generic.Inserted */
+.hl .go { color: #888 } /* Generic.Output */
+.hl .gp { color: #C65D09; font-weight: bold } /* Generic.Prompt */
+.hl .gs { font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.hl .gt { color: #04D } /* Generic.Traceback */
+.hl .kc { color: #007020; font-weight: bold } /* Keyword.Constant */
+.hl .kd { color: #007020; font-weight: bold } /* Keyword.Declaration */
+.hl .kn { color: #007020; font-weight: bold } /* Keyword.Namespace */
+.hl .kp { color: #007020 } /* Keyword.Pseudo */
+.hl .kr { color: #007020; font-weight: bold } /* Keyword.Reserved */
+.hl .kt { color: #902000 } /* Keyword.Type */
+.hl .m { color: #40A070 } /* Literal.Number */
+.hl .s { color: #4070A0 } /* Literal.String */
+.hl .na { color: #4070A0 } /* Name.Attribute */
+.hl .nb { color: #007020 } /* Name.Builtin */
+.hl .nc { color: #0E84B5; font-weight: bold } /* Name.Class */
+.hl .no { color: #60ADD5 } /* Name.Constant */
+.hl .nd { color: #555; font-weight: bold } /* Name.Decorator */
+.hl .ni { color: #D55537; font-weight: bold } /* Name.Entity */
+.hl .ne { color: #007020 } /* Name.Exception */
+.hl .nf { color: #06287E } /* Name.Function */
+.hl .nl { color: #002070; font-weight: bold } /* Name.Label */
+.hl .nn { color: #0E84B5; font-weight: bold } /* Name.Namespace */
+.hl .nt { color: #062873; font-weight: bold } /* Name.Tag */
+.hl .nv { color: #BB60D5 } /* Name.Variable */
+.hl .ow { color: #007020; font-weight: bold } /* Operator.Word */
+.hl .w { color: #BBB } /* Text.Whitespace */
+.hl .mb { color: #40A070 } /* Literal.Number.Bin */
+.hl .mf { color: #40A070 } /* Literal.Number.Float */
+.hl .mh { color: #40A070 } /* Literal.Number.Hex */
+.hl .mi { color: #40A070 } /* Literal.Number.Integer */
+.hl .mo { color: #40A070 } /* Literal.Number.Oct */
+.hl .sa { color: #4070A0 } /* Literal.String.Affix */
+.hl .sb { color: #4070A0 } /* Literal.String.Backtick */
+.hl .sc { color: #4070A0 } /* Literal.String.Char */
+.hl .dl { color: #4070A0 } /* Literal.String.Delimiter */
+.hl .sd { color: #4070A0; font-style: italic } /* Literal.String.Doc */
+.hl .s2 { color: #4070A0 } /* Literal.String.Double */
+.hl .se { color: #4070A0; font-weight: bold } /* Literal.String.Escape */
+.hl .sh { color: #4070A0 } /* Literal.String.Heredoc */
+.hl .si { color: #70A0D0; font-style: italic } /* Literal.String.Interpol */
+.hl .sx { color: #C65D09 } /* Literal.String.Other */
+.hl .sr { color: #235388 } /* Literal.String.Regex */
+.hl .s1 { color: #4070A0 } /* Literal.String.Single */
+.hl .ss { color: #517918 } /* Literal.String.Symbol */
+.hl .bp { color: #007020 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #06287E } /* Name.Function.Magic */
+.hl .vc { color: #BB60D5 } /* Name.Variable.Class */
+.hl .vg { color: #BB60D5 } /* Name.Variable.Global */
+.hl .vi { color: #BB60D5 } /* Name.Variable.Instance */
+.hl .vm { color: #BB60D5 } /* Name.Variable.Magic */
+.hl .il { color: #40A070 } /* Literal.Number.Integer.Long */}
+[data-theme="dark"] .hl{pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hl .hll { background-color: #49483e }
+.hl { background: #272822; color: #F8F8F2 }
+.hl .c { color: #959077 } /* Comment */
+.hl .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.hl .esc { color: #F8F8F2 } /* Escape */
+.hl .g { color: #F8F8F2 } /* Generic */
+.hl .k { color: #66D9EF } /* Keyword */
+.hl .l { color: #AE81FF } /* Literal */
+.hl .n { color: #F8F8F2 } /* Name */
+.hl .o { color: #FF4689 } /* Operator */
+.hl .x { color: #F8F8F2 } /* Other */
+.hl .p { color: #F8F8F2 } /* Punctuation */
+.hl .ch { color: #959077 } /* Comment.Hashbang */
+.hl .cm { color: #959077 } /* Comment.Multiline */
+.hl .cp { color: #959077 } /* Comment.Preproc */
+.hl .cpf { color: #959077 } /* Comment.PreprocFile */
+.hl .c1 { color: #959077 } /* Comment.Single */
+.hl .cs { color: #959077 } /* Comment.Special */
+.hl .gd { color: #FF4689 } /* Generic.Deleted */
+.hl .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.hl .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.hl .gr { color: #F8F8F2 } /* Generic.Error */
+.hl .gh { color: #F8F8F2 } /* Generic.Heading */
+.hl .gi { color: #A6E22E } /* Generic.Inserted */
+.hl .go { color: #66D9EF } /* Generic.Output */
+.hl .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.hl .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.hl .gu { color: #959077 } /* Generic.Subheading */
+.hl .gt { color: #F8F8F2 } /* Generic.Traceback */
+.hl .kc { color: #66D9EF } /* Keyword.Constant */
+.hl .kd { color: #66D9EF } /* Keyword.Declaration */
+.hl .kn { color: #FF4689 } /* Keyword.Namespace */
+.hl .kp { color: #66D9EF } /* Keyword.Pseudo */
+.hl .kr { color: #66D9EF } /* Keyword.Reserved */
+.hl .kt { color: #66D9EF } /* Keyword.Type */
+.hl .ld { color: #E6DB74 } /* Literal.Date */
+.hl .m { color: #AE81FF } /* Literal.Number */
+.hl .s { color: #E6DB74 } /* Literal.String */
+.hl .na { color: #A6E22E } /* Name.Attribute */
+.hl .nb { color: #F8F8F2 } /* Name.Builtin */
+.hl .nc { color: #A6E22E } /* Name.Class */
+.hl .no { color: #66D9EF } /* Name.Constant */
+.hl .nd { color: #A6E22E } /* Name.Decorator */
+.hl .ni { color: #F8F8F2 } /* Name.Entity */
+.hl .ne { color: #A6E22E } /* Name.Exception */
+.hl .nf { color: #A6E22E } /* Name.Function */
+.hl .nl { color: #F8F8F2 } /* Name.Label */
+.hl .nn { color: #F8F8F2 } /* Name.Namespace */
+.hl .nx { color: #A6E22E } /* Name.Other */
+.hl .py { color: #F8F8F2 } /* Name.Property */
+.hl .nt { color: #FF4689 } /* Name.Tag */
+.hl .nv { color: #F8F8F2 } /* Name.Variable */
+.hl .ow { color: #FF4689 } /* Operator.Word */
+.hl .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.hl .w { color: #F8F8F2 } /* Text.Whitespace */
+.hl .mb { color: #AE81FF } /* Literal.Number.Bin */
+.hl .mf { color: #AE81FF } /* Literal.Number.Float */
+.hl .mh { color: #AE81FF } /* Literal.Number.Hex */
+.hl .mi { color: #AE81FF } /* Literal.Number.Integer */
+.hl .mo { color: #AE81FF } /* Literal.Number.Oct */
+.hl .sa { color: #E6DB74 } /* Literal.String.Affix */
+.hl .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.hl .sc { color: #E6DB74 } /* Literal.String.Char */
+.hl .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.hl .sd { color: #E6DB74 } /* Literal.String.Doc */
+.hl .s2 { color: #E6DB74 } /* Literal.String.Double */
+.hl .se { color: #AE81FF } /* Literal.String.Escape */
+.hl .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.hl .si { color: #E6DB74 } /* Literal.String.Interpol */
+.hl .sx { color: #E6DB74 } /* Literal.String.Other */
+.hl .sr { color: #E6DB74 } /* Literal.String.Regex */
+.hl .s1 { color: #E6DB74 } /* Literal.String.Single */
+.hl .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.hl .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.hl .fm { color: #A6E22E } /* Name.Function.Magic */
+.hl .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.hl .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.hl .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.hl .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.hl .il { color: #AE81FF } /* Literal.Number.Integer.Long */}
+</style>
+</head>
+<body>
+<header class="topbar">
+<button class="hamburger" aria-label="打开目录">☰</button>
+<a class="brand" href="index.html">AI 项目实战<small>从零生成、验收到持续维护</small></a>
+<div class="spacer"></div>
+<div class="searchbox">
+<input type="search" placeholder="搜索教程内容…" aria-label="搜索">
+<div class="search-results"></div>
+</div>
+<button class="theme-btn" aria-label="切换主题">🌓</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目录"><div class="group">开始</div>
+<a href="index.html" data-nav="index.html">AI 项目实战：从零生成、验收到持续维护</a>
+<div class="group">第一部分 · 建立正确的 AI 开发方式</div>
+<a href="chapters/ch01-why-projects-fail.html" data-nav="chapters/ch01-why-projects-fail.html">第 1 章　AI 能生成代码，为什么项目仍然会失败</a>
+<a href="labs/lab01-disposable-prototype.html" data-nav="labs/lab01-disposable-prototype.html">实验 1：一次性原型——生成、观察、修改、丢弃</a>
+<a href="chapters/ch02-project-basics.html" data-nav="chapters/ch02-project-basics.html">第 2 章　零基础必备：看懂项目、运行项目和阅读报错</a>
+<a href="chapters/ch03-git-safety.html" data-nav="chapters/ch03-git-safety.html">第 3 章　Git：AI 开发的安全带与时间机器</a>
+<div class="group">第二部分 · 从想法到可实施规格</div>
+<a href="chapters/ch04-intent-and-acceptance.html" data-nav="chapters/ch04-intent-and-acceptance.html">第 4 章　从想法到意图：先决定不做什么</a>
+<a href="chapters/ch05-spec-driven-development.html" data-nav="chapters/ch05-spec-driven-development.html">第 5 章　规格驱动开发：把需求写成可验证契约</a>
+<a href="chapters/ch06-architecture-and-planning.html" data-nav="chapters/ch06-architecture-and-planning.html">第 6 章　最小架构、技术决策与任务拆分</a>
+<a href="labs/lab02-project-blueprint.html" data-nav="labs/lab02-project-blueprint.html">综合实验二：不写代码，完成项目蓝图</a>
+<div class="group">第三部分 · AI 生成、验证与首次交付</div>
+<a href="chapters/ch07-vertical-slice.html" data-nav="chapters/ch07-vertical-slice.html">第 7 章　纵向打通：生成第一个真正可用的版本</a>
+<a href="chapters/ch08-small-steps-and-prs.html" data-nav="chapters/ch08-small-steps-and-prs.html">第 8 章　AI 实现闭环：小任务、小 Diff、小 PR</a>
+<a href="chapters/ch09-testing-and-debugging.html" data-nav="chapters/ch09-testing-and-debugging.html">第 9 章　测试与调试：让“AI 说完成”变成可验证事实</a>
+<a href="chapters/ch10-context-engineering.html" data-nav="chapters/ch10-context-engineering.html">第 10 章　上下文工程：让 AI 在新会话中也能接手项目</a>
+<a href="chapters/ch11-ci-release-deploy.html" data-nav="chapters/ch11-ci-release-deploy.html">第 11 章　CI、发布与部署：从本地能跑到别人能用</a>
+<a href="labs/lab03-release-v1.html" data-nav="labs/lab03-release-v1.html">综合实验三：交付第一个正式版本 v1.0</a>
+<div class="group">第四部分 · 从会生成到能长期维护</div>
+<a href="chapters/ch12-issue-driven-maintenance.html" data-nav="chapters/ch12-issue-driven-maintenance.html">第 12 章　Issue 驱动维护：从问题报告到修复 PR</a>
+<a href="chapters/ch13-change-and-refactoring.html" data-nav="chapters/ch13-change-and-refactoring.html">第 13 章　需求演化与重构：修改系统，而不是重新生成系统</a>
+<a href="chapters/ch14-legacy-modernization.html" data-nav="chapters/ch14-legacy-modernization.html">第 14 章　接手旧项目：从陌生仓库到受控现代化</a>
+<a href="chapters/ch15-data-migration-recovery.html" data-nav="chapters/ch15-data-migration-recovery.html">第 15 章　数据库迁移、备份与真正的故障恢复</a>
+<a href="chapters/ch16-long-term-maintenance.html" data-nav="chapters/ch16-long-term-maintenance.html">第 16 章　长期维护系统：依赖、安全、运行观测与文档漂移</a>
+<a href="labs/lab04-evolution-v1-1.html" data-nav="labs/lab04-evolution-v1-1.html">综合实验四：完成一次完整的需求演化（v1.1）</a>
+<a href="labs/lab05-three-month-maintenance.html" data-nav="labs/lab05-three-month-maintenance.html">综合实验五：模拟项目上线三个月</a>
+<div class="group">第五部分 · 沉淀为可复用的 AI 工程能力</div>
+<a href="chapters/ch17-skill-engineering.html" data-nav="chapters/ch17-skill-engineering.html">第 17 章　Skill 工程：把有效协作流程变成项目资产</a>
+<a href="chapters/ch18-subagents-and-automation.html" data-nav="chapters/ch18-subagents-and-automation.html">第 18 章　子 Agent、Hooks 与 Issue-to-PR 自动化</a>
+<a href="chapters/ch19-platforms-and-tool-migration.html" data-nav="chapters/ch19-platforms-and-tool-migration.html">第 19 章　平台对照与工具迁移：不被某个产品绑定</a>
+<a href="chapters/ch20-capstone.html" data-nav="chapters/ch20-capstone.html">第 20 章　结业项目：完成你自己的 AI 生成与维护闭环</a>
+<div class="group">附录</div>
+<a href="appendices/A-environment.html" data-nav="appendices/A-environment.html">附录 A　开发环境与故障速查</a>
+<a href="appendices/B-command-reference.html" data-nav="appendices/B-command-reference.html">附录 B　命令速查</a>
+<a href="appendices/C-failure-catalog.html" data-nav="appendices/C-failure-catalog.html">附录 C　故障与恢复目录</a>
+<a href="appendices/D-glossary.html" data-nav="appendices/D-glossary.html">附录 D　术语表</a>
+<a href="appendices/E-sources.html" data-nav="appendices/E-sources.html">附录 E　资料来源与核验说明</a>
+<div class="group">可复制模板</div>
+<a href="templates-intro.html" data-nav="templates-intro.html">附录 F：可复制模板原文</a>
+<a href="templates/intent.html" data-nav="templates/intent.html">项目意图（Intent）</a>
+<a href="templates/spec.html" data-nav="templates/spec.html">功能规格（Spec）</a>
+<a href="templates/plan.html" data-nav="templates/plan.html">实施计划（Plan）</a>
+<a href="templates/tasks.html" data-nav="templates/tasks.html">任务列表（Tasks）</a>
+<a href="templates/adr.html" data-nav="templates/adr.html">架构决策记录（ADR-XXXX：标题）</a>
+<a href="templates/issue.html" data-nav="templates/issue.html">Issue：[类型] 一句话描述问题或需求</a>
+<a href="templates/bug-report.html" data-nav="templates/bug-report.html">Bug 报告与诊断记录</a>
+<a href="templates/pr-checklist.html" data-nav="templates/pr-checklist.html">PR 检查清单</a>
+<a href="templates/release-checklist.html" data-nav="templates/release-checklist.html">发布检查清单（Release）</a>
+<a href="templates/runbook.html" data-nav="templates/runbook.html">运行维护手册（Runbook）</a>
+<a href="templates/handoff.html" data-nav="templates/handoff.html">会话交接文档（Handoff）</a>
+<a href="templates/definition-of-done.html" data-nav="templates/definition-of-done.html">完成定义（Definition of Done）</a></nav>
+<main class="content"><article><h1 id="1-ai">第 1 章　AI 能生成代码，为什么项目仍然会失败</h1>
+<blockquote>
+<p>本章成果：亲手生成一个订阅管理器的一次性原型，记录它为什么不能作为正式项目，并建立“AI 负责实现、人负责验收”的基本工作习惯。</p>
+</blockquote>
+<h2 id="1">1. 本章成果</h2>
+<p>完成本章后，你会得到一个标记为 <code>v0.0</code> 的临时原型，以及一份属于你自己的项目问题清单。</p>
+<p>具体产出包括：</p>
+<ul>
+<li>一个单文件 HTML 原型 <code>index.html</code></li>
+<li>一份人工观察记录 <code>observations.md</code></li>
+<li>至少三个可复述的问题，例如需求误解、状态丢失、金额处理不清、缺少测试、修改范围失控</li>
+<li>一个明确结论：这个原型只能用于学习，不应直接继续扩展成正式项目</li>
+</ul>
+<p>本章不追求“功能越多越好”。相反，我们故意让 AI 快速生成一个看起来能跑的页面，然后观察它缺少哪些东西。后面所有章节会逐步补齐这些缺口：需求与规格、架构、测试、Git、上下文、发布和维护。</p>
+<h2 id="2">2. 为什么需要它</h2>
+<p>很多 AI 编程教程从“安装工具”或“写提示词”开始，但真正拉开差距的不是生成能力，而是能否持续修改和验收。AI 已经可以很快产出页面、接口和数据库代码；项目失败通常发生在后续阶段：需求变化时不知道改哪里，代码越来越多时不敢改，出错时无法复现，上线后没有日志、备份和回滚。</p>
+<p>一次性原型实验有三个作用：</p>
+<ol>
+<li><strong>让你亲身体验 Demo 与产品的区别。</strong> 页面能打开，不等于需求完整；AI 说“已完成”，不等于用户可以安全使用。</li>
+<li><strong>建立证据意识。</strong> 后续每章都会要求你留下命令输出、测试结果、Diff 或运行记录，而不是接受模型的自然语言承诺。</li>
+<li><strong>避免过早依赖某个工具。</strong> 本章只需要浏览器、文本编辑器和任意能写代码的 AI。Python、Git、测试和部署会按学习顺序逐步加入。</li>
+</ol>
+<p><a href="https://jyywiki.cn/GSE/2026/">生成式软件工程课程</a>在第一讲中就强调，成功演示并不等于需求实现；<a href="https://huangchiyu.com/ChiYu-Blog/series/2025ithomeironman/">ChiYu 的《左手蓝图，右手魔法》系列</a>也用“只想要脚踏车，却得到航空母舰”描述无约束 Vibe Coding 的失控。本章会把这种失控变成一次可控的观察实验。</p>
+<h2 id="3">3. 最少必备知识</h2>
+<ul>
+<li><strong>HTML、CSS、JavaScript 的分工：</strong> HTML 是内容结构，CSS 是外观，JavaScript 负责交互。本章原型不会建立真正的前后端分离系统。</li>
+<li><strong>浏览器本地文件：</strong> 双击或通过命令打开的 <code>index.html</code> 只运行在当前浏览器中，不等于部署到服务器。</li>
+<li><strong>浏览器控制台：</strong> 通常按 <code>F12</code> 或 <code>Ctrl+Shift+I</code> 打开，用于查看 JavaScript 错误。</li>
+<li><strong>内存数据与持久化数据：</strong> 数据如果只保存在页面 JavaScript 变量中，刷新后通常会消失；如果写入 <code>localStorage</code>，同一浏览器可能保留，但仍不是数据库。</li>
+<li><strong>需求、验收、回归：</strong> 需求说明要做什么，验收说明如何证明做到了，回归确保修复或新增功能没有破坏旧行为。</li>
+<li><strong>一次性原型：</strong> 目标是验证想法和暴露问题，不是长期维护对象。</li>
+</ul>
+<p>如果你不理解某个术语，不必立刻查全部资料。本章只需要能打开文件、点击页面、阅读错误并记录现象。</p>
+<h2 id="4">4. 起始项目状态</h2>
+<p>本章从一个空目录开始，不依赖任何配套仓库、模板或在线环境。</p>
+<p>建议目录：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>subscription-tracker-prototype/
+</code></pre></div></div>
+
+<p>完成本章后，目录至少应包含：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>subscription-tracker-prototype/
+├─ index.html
+└─ observations.md
+</code></pre></div></div>
+
+<p>你可以自行增加：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>subscription-tracker-prototype/
+├─ index-before-edit.html
+└─ evidence/
+   ├─ 01-initial.png
+   ├─ 02-add-record.png
+   └─ 03-console-error.png
+</code></pre></div></div>
+
+<p>安全边界：</p>
+<ul>
+<li>不要输入真实银行卡、账号密码、手机号或个人订阅数据。</li>
+<li>不要连接真实支付、邮件、短信或云服务。</li>
+<li>不要把本章原型部署给真实用户。</li>
+</ul>
+<p>本章故意不创建正式项目目录 <code>subscription-tracker/</code>。那个目录会在后续章节中建立，避免一次性实验污染正式项目历史。</p>
+<h2 id="5-ai">5. 操作步骤与 AI 任务示例</h2>
+<h3 id="51">5.1 创建实验目录</h3>
+<p>在 PowerShell、Terminal 或其他终端中执行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">mkdir</span> <span class="n">subscription-tracker-prototype</span>
+<span class="nb">cd </span><span class="n">subscription-tracker-prototype</span>
+</code></pre></div></div>
+
+<p>Windows、macOS 和 Linux 的这条命令基本相同。进入目录后，再创建空白文件：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>index.html
+observations.md
+</code></pre></div></div>
+
+<p>也可以先让 AI 生成内容，再由你保存为这两个文件。</p>
+<h3 id="52-ai">5.2 使用第一个 AI 任务生成一次性原型</h3>
+<p>将以下内容发送给你使用的 AI 编码工具。这个提示词刻意限制范围和输出形式，避免 AI 引入框架、后端或真实外部服务。</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：
+创建一个用于教学观察的一次性订阅管理器 HTML 原型。
+
+上下文：
+这是教程第 1 章的 v0.0 实验，读者可能没有编程经验。它只用于暴露 AI 生成项目的常见问题，不用于真实交付。
+
+范围：
+只允许创建一个自包含的 index.html，内部可包含 HTML、CSS 和 JavaScript。
+实现以下功能：
+1. 展示一个订阅列表。
+2. 初始提供两条示例数据。
+3. 用户可添加一条新订阅。
+4. 每条记录包含 name、amount_cents、renewal_date、note 四个字段。
+5. amount_cents 使用整数“分”表示金额，页面显示时可转换为元，但内部计算和存储保持整数。
+
+约束：
+- 不使用 React、Vue、构建工具、后端、数据库或任何外部库。
+- 不请求外部 URL，不加载远程字体、图片或脚本。
+- 不保存真实个人数据，不使用支付、短信、邮件或认证。
+- 不要求持久化；刷新后新增数据消失是可接受结果，但必须在说明中写明当前状态保存方式。
+- 代码应能在现代浏览器中直接打开运行。
+
+验收：
+1. 打开 index.html 后能看到示例订阅。
+2. 填写 name=&quot;测试网盘&quot;、amount_cents=9900、renewal_date=&quot;2027-01-01&quot;、note=&quot;教学示例&quot; 后可以新增一条记录。
+3. amount_cents 为 0、负数或非整数时应被拒绝，并显示可理解的错误。
+4. 控制台没有阻塞页面使用的 JavaScript 错误。
+5. 明确说明数据是否会在刷新后保留。
+
+输出：
+1. 完整 index.html。
+2. 不超过 15 行的实现说明。
+3. 不超过 10 条已知限制。
+不要输出安装步骤、部署建议或后续扩展计划。
+</code></pre></div></div>
+
+<p>如果 AI 返回多个文件、框架项目或要求安装依赖，不要继续扩展。把最后一段约束重新发给它，要求“只输出完整单文件 <code>index.html</code>”。</p>
+<h3 id="53">5.3 保存并打开原型</h3>
+<p>把 AI 输出保存为 <code>index.html</code>，确保文件编码为 UTF-8。</p>
+<p>打开方式：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c"># Windows PowerShell</span>
+<span class="nb">Invoke-Item</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span>
+</code></pre></div></div>
+
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c1"># macOS</span>
+open<span class="w"> </span>index.html
+</code></pre></div></div>
+
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c1"># Linux，根据桌面环境选择其中一种</span>
+xdg-open<span class="w"> </span>index.html
+</code></pre></div></div>
+
+<p>也可以直接在文件管理器中双击。打开后按 <code>F12</code> 或 <code>Ctrl+Shift+I</code> 查看控制台。</p>
+<h3 id="54">5.4 执行第一轮人工验收</h3>
+<p>逐项测试并记录实际结果：</p>
+<ol>
+<li>页面是否显示两条示例订阅？</li>
+<li>添加 <code>测试网盘 / 9900 / 2027-01-01 / 教学示例</code> 是否成功？</li>
+<li>金额显示是否正确？<code>9900</code> 分应显示为 <code>99.00</code> 元或等价格式。</li>
+<li>输入 <code>-1</code>、<code>0</code>、<code>99.5</code>、空名称时，页面是否阻止无效数据？</li>
+<li>刷新页面后，新增记录是否仍然存在？</li>
+<li>控制台是否出现 JavaScript 错误？</li>
+</ol>
+<p>在 <code>observations.md</code> 中使用如下表格：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>| 测试 | 预期 | 实际 | 证据 | 判断 |
+|---|---|---|---|---|
+| 初始列表 | 显示两条示例 | 待填写 | 截图或控制台输出 | 通过/失败/范围外 |
+| 新增有效记录 | 列表增加一条 | 待填写 | 截图 | 通过/失败 |
+| 金额显示 | 9900 分显示为 99.00 元 | 待填写 | 截图 | 通过/失败 |
+| 无效金额 | 拒绝并提示 | 待填写 | 截图 | 通过/失败 |
+| 刷新后状态 | 记录当前保存方式 | 待填写 | 截图 | 说明 |
+| 控制台错误 | 无阻塞错误 | 待填写 | 错误文本 | 通过/失败 |
+</code></pre></div></div>
+
+<h3 id="55">5.5 观察一次需求变更</h3>
+<p>需求变更是项目维护的常态。我们先制造一次很小的变更，观察 AI 是否只改必要范围。</p>
+<p>先备份当前文件：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c"># Windows PowerShell</span>
+<span class="nb">Copy-Item</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span> <span class="n">index-before-edit</span><span class="p">.</span><span class="n">html</span>
+</code></pre></div></div>
+
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c1"># macOS/Linux</span>
+cp<span class="w"> </span>index.html<span class="w"> </span>index-before-edit.html
+</code></pre></div></div>
+
+<p>发送第二个 AI 任务：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code>目标：
+在现有 index.html 中增加“编辑已存在订阅”的功能。
+
+上下文：
+当前文件是一个教学用一次性原型，数据保存在浏览器页面状态中，不是正式产品。
+
+范围：
+只允许修改现有 index.html。
+只能增加编辑 name、amount_cents、renewal_date、note 的能力。
+不要修改现有视觉风格，不要新增页面、文件或外部依赖。
+
+约束：
+- 编辑前必须保留原值。
+- 取消编辑后不得留下重复记录或破坏现有列表。
+- 仍然使用整数 amount_cents。
+- 不引入 React、Vue、构建工具、后端、数据库或外部库。
+
+验收：
+1. 可以选择任意一条记录进入编辑状态。
+2. 修改并保存后，列表只显示更新后的结果，不产生重复项。
+3. 取消编辑后列表保持不变。
+4. 原有新增和无效输入校验仍然可用。
+5. 说明本次修改涉及哪些 HTML、CSS 或 JavaScript 区域。
+
+输出：
+1. 完整更新后的 index.html。
+2. 不超过 10 条变更说明。
+3. 不超过 5 条新增风险。
+</code></pre></div></div>
+
+<p>保存新版本，重复上一轮测试，并额外验证：</p>
+<ul>
+<li>是否能选择一条记录进入编辑状态？</li>
+<li>保存后是否只更新该记录？</li>
+<li>取消后是否保持原样？</li>
+<li>原来的新增和校验是否仍然可用？</li>
+</ul>
+<h3 id="56">5.6 记录问题并丢弃原型</h3>
+<p>在 <code>observations.md</code> 中至少写下三类问题：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="gu">## 这个原型不能作为正式项目的原因</span>
+
+<span class="k">1.</span> 需求方面：……
+<span class="k">2.</span> 数据方面：……
+<span class="k">3.</span> 质量方面：……
+<span class="k">4.</span> 维护方面：……
+<span class="k">5.</span> 交付方面：……
+</code></pre></div></div>
+
+<p>你可以写：</p>
+<ul>
+<li>没有规格，AI 只能猜测用户真实意图。</li>
+<li>数据只在浏览器中，不能多设备使用，也没有备份。</li>
+<li>没有测试，任何修改都可能破坏旧功能。</li>
+<li>没有 Git，AI 大范围修改后无法可靠回退。</li>
+<li>没有部署、日志和监控，不能判断线上问题。</li>
+</ul>
+<p>这些正是后续章节要解决的问题。完成记录后，不要继续向这个原型添加功能。它是 <code>v0.0</code>，已经完成教学使命。</p>
+<h3 id="57">5.7 配套实验</h3>
+<p>如果你希望执行更完整的步骤、自检表和常见失败处理，可以继续完成<a href="../labs/lab01-disposable-prototype.html">实验 1：一次性原型</a>。</p>
+<h2 id="6-ai">6. AI 应生成的产物</h2>
+<p>第一个任务完成后，AI 应提供：</p>
+<ul>
+<li>完整单文件 <code>index.html</code></li>
+<li>简短实现说明</li>
+<li>已知限制</li>
+</ul>
+<p>第二个任务完成后，AI 应提供：</p>
+<ul>
+<li>更新后的完整 <code>index.html</code></li>
+<li>变更说明</li>
+<li>新增风险</li>
+</ul>
+<p>以下内容必须由你完成，不能直接让 AI 替代：</p>
+<ul>
+<li><code>observations.md</code></li>
+<li>每项测试的实际结果</li>
+<li>控制台错误原文</li>
+<li>是否通过验收的最终判断</li>
+</ul>
+<p>如果 AI 在输出中声称“已通过全部测试”，你仍应把这句话视为待验证声明。只有浏览器中的实际行为、控制台信息和你的记录才是证据。</p>
+<h2 id="7">7. 人工检查点</h2>
+<p>打开 <code>index.html</code> 的源代码，重点检查：</p>
+<ol>
+<li><strong>外部依赖</strong>
+   <code>powershell
+   # Windows PowerShell
+   Select-String -Path index.html -Pattern "https?://"</code></li>
+</ol>
+<p><code>bash
+   # macOS/Linux
+   grep -nE "https?://" index.html</code></p>
+<p>如果搜到外部 URL，逐个判断它是否违反了“不请求外部资源”的约束。</p>
+<ol start="2">
+<li><strong>危险或可疑代码</strong>
+   <code>powershell
+   Select-String -Path index.html -Pattern "eval\(|document\.write|innerHTML"</code></li>
+</ol>
+<p><code>bash
+   grep -nE "eval\(|document\.write|innerHTML" index.html</code></p>
+<p>出现这些模式不一定是致命错误，但你需要理解它们的用途。若无法解释，就不要继续扩展该文件。</p>
+<ol start="3">
+<li>
+<p><strong>金额处理</strong>
+   查找 <code>amount_cents</code>、<code>parseInt</code>、<code>Number</code>、<code>parseFloat</code> 等关键字，确认内部是否真的使用整数，而不是先转成浮点数再四舍五入。</p>
+</li>
+<li>
+<p><strong>状态保存方式</strong>
+   查找 <code>localStorage</code>、<code>sessionStorage</code> 或 JavaScript 变量。记录刷新后数据为什么会保留或消失。</p>
+</li>
+<li>
+<p><strong>第二次修改范围</strong>
+   对比 <code>index-before-edit.html</code> 与新 <code>index.html</code>。此时你还没有学习 Git Diff，因此可以先观察：
+   - 文件大小是否变化异常
+   - 页面结构是否被重写
+   - 原有功能是否仍能使用
+   - AI 的变更说明是否与实际测试一致</p>
+</li>
+<li>
+<p><strong>AI 自述与证据是否一致</strong>
+   如果 AI 说“已保留原功能”，你必须重新测试新增和校验；如果 AI 说“不会丢失数据”，你必须刷新页面验证。</p>
+</li>
+</ol>
+<h2 id="8">8. 验收命令与通过标准</h2>
+<p>执行以下检查：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c"># Windows PowerShell</span>
+<span class="nb">Get-ChildItem</span>
+<span class="nb">Get-Item</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span>
+<span class="nb">Get-Item</span> <span class="n">observations</span><span class="p">.</span><span class="nb">md</span>
+<span class="nb">Select-String</span> <span class="n">-Path</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span> <span class="n">-Pattern</span> <span class="s2">&quot;https?://&quot;</span>
+</code></pre></div></div>
+
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="c1"># macOS/Linux</span>
+ls<span class="w"> </span>-l
+<span class="nb">test</span><span class="w"> </span>-f<span class="w"> </span>index.html<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;index.html exists&quot;</span>
+<span class="nb">test</span><span class="w"> </span>-f<span class="w"> </span>observations.md<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;observations.md exists&quot;</span>
+grep<span class="w"> </span>-nE<span class="w"> </span><span class="s2">&quot;https?://&quot;</span><span class="w"> </span>index.html
+</code></pre></div></div>
+
+<p>本章通过标准：</p>
+<ol>
+<li><code>index.html</code> 和 <code>observations.md</code> 都存在于实验目录中。</li>
+<li>浏览器能打开原型，并记录初始页面状态。</li>
+<li>你完成了至少六项第一轮测试，并记录实际结果。</li>
+<li>你完成了一次“编辑功能”需求变更，并记录至少一个新增问题或风险。</li>
+<li><code>observations.md</code> 至少写出三个原型不能直接进入正式项目的原因。</li>
+<li>你没有把 AI 的“已完成”声明直接当作验收结果。</li>
+</ol>
+<p>不要要求原型没有 Bug。本章的通过标准不是完美，而是你能准确说出它哪里不完整、为什么不可交付，以及下一步应该补什么。</p>
+<h2 id="9">9. 常见失败及恢复方法</h2>
+<table>
+<thead>
+<tr>
+<th>症状</th>
+<th>可能原因</th>
+<th>恢复动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI 输出 React、Node.js、多个文件或安装步骤</td>
+<td>原始需求中“完整”“项目”等词触发过度设计</td>
+<td>停止安装；重发约束，要求“只输出完整单文件 <code>index.html</code>，不使用框架和外部依赖”</td>
+</tr>
+<tr>
+<td>浏览器打开后空白</td>
+<td>HTML 未保存完整、文件编码错误、JavaScript 初始化异常</td>
+<td>打开控制台复制错误；从 AI 最近一次完整输出重新保存；必要时要求它只修复报错，不新增功能</td>
+</tr>
+<tr>
+<td>点击“添加”没有反应</td>
+<td>按钮 ID 与 JavaScript 不匹配、事件未绑定、脚本报错中断</td>
+<td>记录控制台错误和按钮 HTML；要求 AI 只修复事件绑定；若无法定位，恢复 <code>index-before-edit.html</code> 后重新描述问题</td>
+</tr>
+<tr>
+<td>中文显示乱码</td>
+<td>文件不是 UTF-8，或缺少 <code>&lt;meta charset="utf-8"&gt;</code></td>
+<td>用支持 UTF-8 的编辑器重新保存；检查 HTML 头部 charset；不要让 AI 重写整个页面</td>
+</tr>
+<tr>
+<td>刷新后新增数据消失</td>
+<td>数据只保存在 JavaScript 内存中，或原型未实现持久化</td>
+<td>这不是必须立即修复的 Bug，而是设计边界。记录当前保存方式，并说明正式项目需要数据库和迁移策略</td>
+</tr>
+<tr>
+<td>第二次需求变更后原功能失效</td>
+<td>AI 重写了无关代码，或没有保留旧行为基线</td>
+<td>恢复 <code>index-before-edit.html</code>；将变更拆得更小；重新发送只包含编辑功能的范围约束</td>
+</tr>
+</tbody>
+</table>
+<p>恢复时遵循一个原则：<strong>先回到最后一个已知可运行状态，再缩小任务。</strong> 不要在一个已经混乱的文件上继续叠加新功能。</p>
+<h2 id="10-git">10. 本章 Git 提交</h2>
+<p>第 3 章才会正式学习 Git，因此本章不要求你已经安装或初始化仓库。</p>
+<p>如果你希望保留这个一次性原型作为学习记录，可在第 3 章之后执行：</p>
+<div class="code-wrap"><button class="copy-btn" type="button">复制</button><div class="hl"><pre><span></span><code><span class="n">git</span> <span class="n">init</span>
+<span class="n">git</span> <span class="k">switch</span> <span class="n">-c</span> <span class="n">exp</span><span class="p">/</span><span class="n">disposable-prototype</span>
+<span class="n">git</span> <span class="n">add</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span> <span class="n">observations</span><span class="p">.</span><span class="nb">md</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="n">-m</span> <span class="s2">&quot;test: record disposable prototype limitations&quot;</span>
+<span class="n">git</span> <span class="n">tag</span> <span class="n">v0</span><span class="p">.</span><span class="n">0</span>
+</code></pre></div></div>
+
+<p>说明：</p>
+<ul>
+<li><code>exp/disposable-prototype</code> 表示这是实验分支，不应继续作为正式项目主线。</li>
+<li><code>v0.0</code> 只是本教程的版本约定，不代表存在一个可下载的现成标签。</li>
+<li>不必提交 <code>index-before-edit.html</code>，除非你想保留需求变更前后的人工对照。</li>
+<li>不要把本章原型推送到公开仓库，尤其当其中包含你临时记录的个人测试数据时。</li>
+</ul>
+<h2 id="11">11. 练习与扩展</h2>
+<ol>
+<li><strong>换一个问题领域重做实验。</strong> 把订阅管理器换成“读书笔记”或“家庭物品清单”，仍然只允许单文件 HTML。观察 AI 是否犯同类错误。</li>
+<li><strong>只允许 AI 提问，不允许写代码。</strong> 把你的模糊想法发给 AI，要求它最多提出 10 个澄清问题。整理哪些问题真正影响实现。</li>
+<li><strong>列出五个隐藏假设。</strong> 例如“金额单位是元还是分”“续费日期是否包含时区”“删除是否需要确认”“数据是否多设备同步”。</li>
+<li><strong>比较两种修改策略。</strong> 第一次要求“增加完整编辑功能”，第二次要求“只增加编辑备注字段”，记录修改范围和失败风险差异。</li>
+<li><strong>写一段 200 字复盘。</strong> 说明如果直接把这个原型交给朋友使用，最可能在哪一天、因为什么问题失败。</li>
+</ol>
+<h2 id="12">12. 参考资料</h2>
+<ul>
+<li><a href="https://jyywiki.cn/GSE/2026/">生成式软件工程（2026 秋季学期）</a></li>
+<li><a href="https://jyywiki.cn/GSE/2026/lect1.html">GSE 2026 第一讲：欢迎来到未来</a></li>
+<li><a href="https://huangchiyu.com/ChiYu-Blog/series/2025ithomeironman/">ChiYu：2025 iThome 鐵人賽《左手蓝图，右手魔法》系列</a></li>
+</ul></article><nav class="pagenav"><a href="index.html"><small>← 上一篇</small>AI 项目实战：从零生成、验收到持续维护</a><a class="next" href="labs/lab01-disposable-prototype.html"><small>下一篇 →</small>实验 1：一次性原型——生成、观察、修改、丢弃</a></nav></main>
+</div>
+<footer>AI 项目实战 · 从零生成、验收到持续维护 · 由纯静态 HTML 生成，可部署到 Cloudflare Pages / GitHub Pages</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>
