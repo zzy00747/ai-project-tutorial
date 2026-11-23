@@ -1,6 +1,7 @@
-# Markdown 源文件（site/ 为构建产物，源码在 src/）
+# Markdown 源文件（site/ 由 mkdocs build 生成）
 *.pyc
 __pycache__/
 .venv/
 *.db
 *.log
+.claude/

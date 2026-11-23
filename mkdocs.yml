@@ -1,0 +1,118 @@
+site_name: AI 项目实战
+site_description: 从零生成、验收到持续维护 —— 用一个真实项目掌握需求、规格、编码、测试、部署、演化与 AI 工程化协作
+site_url: ""
+repo_url: https://github.com/zzy00747/ai-project-tutorial
+repo_name: zzy00747/ai-project-tutorial
+edit_uri: edit/main/src/
+copyright: AI 项目实战 · 仅供学习使用
+
+docs_dir: src
+site_dir: site
+
+theme:
+  name: material
+  language: zh
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - header.autohide
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.prune
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: violet
+      toggle:
+        icon: material/weather-night
+        name: 切换到暗色主题
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: violet
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到亮色主题
+  font:
+    text: Noto Sans SC
+    code: JetBrains Mono
+  icon:
+    logo: material/rocket-launch-outline
+    repo: fontawesome/brands/github
+  favicon: assets/favicon.png
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/zzy00747/ai-project-tutorial
+
+extra_css:
+  - stylesheets/custom.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 2-3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search:
+      separator: '[\s\-\.]+'
+      lang:
+        - zh
+        - en
+  - minify:
+      minify_html: true
+
+validation:
+  links:
+    absolute_links: relative_to_docs
