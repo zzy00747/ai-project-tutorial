@@ -267,7 +267,7 @@ cp index.html index-before-edit.html
 
 ### 5.7 配套实验
 
-如果你希望执行更完整的步骤、自检表和常见失败处理，可以继续完成[实验 1：一次性原型](../labs/lab01-disposable-prototype.html。
+如果你希望执行更完整的步骤、自检表和常见失败处理，可以继续完成[实验 1：一次性原型](../labs/lab01-disposable-prototype.md)。
 
 ## 6. AI 应生成的产物
 

@@ -9,6 +9,60 @@ copyright: AI 项目实战 · 仅供学习使用
 docs_dir: src
 site_dir: site
 
+nav:
+  - 首页: index.md
+  - 第一部分 · 建立正确的 AI 开发方式:
+      - 第 1 章 AI 能生成代码，为什么项目仍然会失败: chapters/ch01-why-projects-fail.md
+      - 实验一 一次性原型与失控复盘: labs/lab01-disposable-prototype.md
+      - 第 2 章 零基础必备：看懂项目、运行项目和阅读报错: chapters/ch02-project-basics.md
+      - 第 3 章 Git：AI 开发的安全带与时间机器: chapters/ch03-git-safety.md
+  - 第二部分 · 从模糊想法到可实施规格:
+      - 第 4 章 从想法到意图：先决定不做什么: chapters/ch04-intent-and-acceptance.md
+      - 第 5 章 规格驱动开发：把需求写成可验证契约: chapters/ch05-spec-driven-development.md
+      - 第 6 章 最小架构、技术决策与任务拆分: chapters/ch06-architecture-and-planning.md
+      - 实验二 不写代码，完成项目蓝图: labs/lab02-project-blueprint.md
+  - 第三部分 · AI 生成、验证与首次交付:
+      - 第 7 章 纵向打通：生成第一个真正可用的版本: chapters/ch07-vertical-slice.md
+      - 第 8 章 AI 实现闭环：小任务、小 Diff、小 PR: chapters/ch08-small-steps-and-prs.md
+      - 第 9 章 测试与调试：让"AI 说完成"变成可验证事实: chapters/ch09-testing-and-debugging.md
+      - 第 10 章 上下文工程：让 AI 在新会话中也能接手项目: chapters/ch10-context-engineering.md
+      - 第 11 章 CI、发布与部署：从本地能跑到别人能用: chapters/ch11-ci-release-deploy.md
+      - 实验三 交付第一个正式版本 v1.0: labs/lab03-release-v1.md
+  - 第四部分 · 从会生成到能长期维护:
+      - 第 12 章 Issue 驱动维护：从问题报告到修复 PR: chapters/ch12-issue-driven-maintenance.md
+      - 第 13 章 需求演化与重构：修改系统，而不是重新生成系统: chapters/ch13-change-and-refactoring.md
+      - 第 14 章 接手旧项目：从陌生仓库到受控现代化: chapters/ch14-legacy-modernization.md
+      - 第 15 章 数据库迁移、备份与真正的故障恢复: chapters/ch15-data-migration-recovery.md
+      - 第 16 章 长期维护系统：依赖、安全、运行观测与文档漂移: chapters/ch16-long-term-maintenance.md
+      - 实验四 完成一次完整的需求演化: labs/lab04-evolution-v1-1.md
+      - 实验五 模拟项目上线三个月: labs/lab05-three-month-maintenance.md
+  - 第五部分 · 沉淀为可复用的 AI 工程能力:
+      - 第 17 章 Skill 工程：把有效协作流程变成项目资产: chapters/ch17-skill-engineering.md
+      - 第 18 章 子 Agent、Hooks 与 Issue-to-PR 自动化: chapters/ch18-subagents-and-automation.md
+      - 第 19 章 平台对照与工具迁移：不被某个产品绑定: chapters/ch19-platforms-and-tool-migration.md
+      - 第 20 章 结业项目：完成你自己的 AI 生成与维护闭环: chapters/ch20-capstone.md
+  - 附录:
+      - 附录 A 开发环境与故障速查: appendices/A-environment.md
+      - 附录 B 命令速查: appendices/B-command-reference.md
+      - 附录 C 故障与恢复目录: appendices/C-failure-catalog.md
+      - 附录 D 术语表: appendices/D-glossary.md
+      - 附录 E 资料来源与核验说明: appendices/E-sources.md
+  - 写作与维护:
+      - 写作与集成契约: writing-guide.md
+
+      - 项目意图 Intent: blueprints/intent.md
+      - 功能规格 Spec: blueprints/spec.md
+      - 实施计划 Plan: blueprints/plan.md
+      - 任务列表 Tasks: blueprints/tasks.md
+      - 架构决策记录 ADR: blueprints/adr.md
+      - Issue: blueprints/issue.md
+      - Bug 报告: blueprints/bug-report.md
+      - PR 检查清单: blueprints/pr-checklist.md
+      - 发布检查清单: blueprints/release-checklist.md
+      - 运行维护手册 Runbook: blueprints/runbook.md
+      - 会话交接 Handoff: blueprints/handoff.md
+      - 完成定义 Definition of Done: blueprints/definition-of-done.md
+
 theme:
   name: material
   language: zh

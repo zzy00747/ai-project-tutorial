@@ -47,72 +47,72 @@
 
 ## 第一部分：建立正确的 AI 开发方式
 
-1. [AI 能生成代码，为什么项目仍然会失败](chapters/ch01-why-projects-fail.html
-2. [零基础必备：看懂项目、运行项目和阅读报错](chapters/ch02-project-basics.html
-3. [Git：AI 开发的安全带与时间机器](chapters/ch03-git-safety.html
+1. [AI 能生成代码，为什么项目仍然会失败](chapters/ch01-why-projects-fail.md)
+2. [零基础必备：看懂项目、运行项目和阅读报错](chapters/ch02-project-basics.md)
+3. [Git：AI 开发的安全带与时间机器](chapters/ch03-git-safety.md)
 
-- [综合实验一：一次性原型与失控复盘](labs/lab01-disposable-prototype.html
+- [综合实验一：一次性原型与失控复盘](labs/lab01-disposable-prototype.md)
 
 ## 第二部分：从模糊想法到可实施规格
 
-4. [从想法到意图：先决定不做什么](chapters/ch04-intent-and-acceptance.html
-5. [规格驱动开发：把需求写成可验证契约](chapters/ch05-spec-driven-development.html
-6. [最小架构、技术决策与任务拆分](chapters/ch06-architecture-and-planning.html
+4. [从想法到意图：先决定不做什么](chapters/ch04-intent-and-acceptance.md)
+5. [规格驱动开发：把需求写成可验证契约](chapters/ch05-spec-driven-development.md)
+6. [最小架构、技术决策与任务拆分](chapters/ch06-architecture-and-planning.md)
 
-- [综合实验二：不写代码，完成项目蓝图](labs/lab02-project-blueprint.html
+- [综合实验二：不写代码，完成项目蓝图](labs/lab02-project-blueprint.md)
 
 ## 第三部分：AI 生成、验证与首次交付
 
-7. [纵向打通：生成第一个真正可用的版本](chapters/ch07-vertical-slice.html
-8. [AI 实现闭环：小任务、小 Diff、小 PR](chapters/ch08-small-steps-and-prs.html
-9. [测试与调试：让“AI 说完成”变成可验证事实](chapters/ch09-testing-and-debugging.html
-10. [上下文工程：让 AI 在新会话中也能接手项目](chapters/ch10-context-engineering.html
-11. [CI、发布与部署：从本地能跑到别人能用](chapters/ch11-ci-release-deploy.html
+7. [纵向打通：生成第一个真正可用的版本](chapters/ch07-vertical-slice.md)
+8. [AI 实现闭环：小任务、小 Diff、小 PR](chapters/ch08-small-steps-and-prs.md)
+9. [测试与调试：让“AI 说完成”变成可验证事实](chapters/ch09-testing-and-debugging.md)
+10. [上下文工程：让 AI 在新会话中也能接手项目](chapters/ch10-context-engineering.md)
+11. [CI、发布与部署：从本地能跑到别人能用](chapters/ch11-ci-release-deploy.md)
 
-- [综合实验三：交付第一个正式版本](labs/lab03-release-v1.html
+- [综合实验三：交付第一个正式版本](labs/lab03-release-v1.md)
 
 ## 第四部分：从会生成到能长期维护
 
-12. [Issue 驱动维护：从问题报告到修复 PR](chapters/ch12-issue-driven-maintenance.html
-13. [需求演化与重构：修改系统，而不是重新生成系统](chapters/ch13-change-and-refactoring.html
-14. [接手旧项目：从陌生仓库到受控现代化](chapters/ch14-legacy-modernization.html
-15. [数据库迁移、备份与真正的故障恢复](chapters/ch15-data-migration-recovery.html
-16. [长期维护系统：依赖、安全、运行观测与文档漂移](chapters/ch16-long-term-maintenance.html
+12. [Issue 驱动维护：从问题报告到修复 PR](chapters/ch12-issue-driven-maintenance.md)
+13. [需求演化与重构：修改系统，而不是重新生成系统](chapters/ch13-change-and-refactoring.md)
+14. [接手旧项目：从陌生仓库到受控现代化](chapters/ch14-legacy-modernization.md)
+15. [数据库迁移、备份与真正的故障恢复](chapters/ch15-data-migration-recovery.md)
+16. [长期维护系统：依赖、安全、运行观测与文档漂移](chapters/ch16-long-term-maintenance.md)
 
-- [综合实验四：完成一次完整的需求演化](labs/lab04-evolution-v1-1.html
-- [综合实验五：模拟项目上线三个月](labs/lab05-three-month-maintenance.html
+- [综合实验四：完成一次完整的需求演化](labs/lab04-evolution-v1-1.md)
+- [综合实验五：模拟项目上线三个月](labs/lab05-three-month-maintenance.md)
 
 ## 第五部分：把经验沉淀为可复用的 AI 工程能力
 
-17. [Skill 工程：把有效协作流程变成项目资产](chapters/ch17-skill-engineering.html
-18. [子 Agent、Hooks 与 Issue-to-PR 自动化](chapters/ch18-subagents-and-automation.html
-19. [平台对照与工具迁移：不被某个产品绑定](chapters/ch19-platforms-and-tool-migration.html
-20. [结业项目：完成你自己的 AI 生成与维护闭环](chapters/ch20-capstone.html
+17. [Skill 工程：把有效协作流程变成项目资产](chapters/ch17-skill-engineering.md)
+18. [子 Agent、Hooks 与 Issue-to-PR 自动化](chapters/ch18-subagents-and-automation.md)
+19. [平台对照与工具迁移：不被某个产品绑定](chapters/ch19-platforms-and-tool-migration.md)
+20. [结业项目：完成你自己的 AI 生成与维护闭环](chapters/ch20-capstone.md)
 
 ## 附录
 
-- [附录 A：开发环境与故障速查](appendices/A-environment.html
-- [附录 B：工具命令对照](appendices/B-command-reference.html
-- [附录 C：失败案例库](appendices/C-failure-catalog.html
-- [附录 D：术语表](appendices/D-glossary.html
-- [附录 E：参考资料与来源索引](appendices/E-sources.html
+- [附录 A：开发环境与故障速查](appendices/A-environment.md)
+- [附录 B：工具命令对照](appendices/B-command-reference.md)
+- [附录 C：失败案例库](appendices/C-failure-catalog.md)
+- [附录 D：术语表](appendices/D-glossary.md)
+- [附录 E：参考资料与来源索引](appendices/E-sources.md)
 
 ## 可复制模板
 
 | 模板 | 用途 |
 |---|---|
-| [项目意图](templates/intent.html | 明确用户、问题、范围、约束与成功标准 |
-| [功能规格](templates/spec.html | 记录行为、规则和验收场景 |
-| [实施计划](templates/plan.html | 记录技术方案、影响范围和验证策略 |
-| [任务列表](templates/tasks.html | 把计划拆成可独立验证的小任务 |
-| [架构决策记录](templates/adr.html | 保存技术选择的原因和后果 |
-| [Issue](templates/issue.html | 描述一个可交付的问题或需求 |
-| [Bug 报告](templates/bug-report.html | 保存复现、证据、影响与回归要求 |
-| [PR 检查清单](templates/pr-checklist.html | 审查 Diff、测试、兼容性和交付证据 |
-| [发布检查清单](templates/release-checklist.html | 检查构建、部署、回滚和发布记录 |
-| [运行维护手册](templates/runbook.html | 记录启动、观测、备份和故障处理 |
-| [会话交接](templates/handoff.html | 让新 AI 会话从项目事实继续工作 |
-| [完成定义](templates/definition-of-done.html | 统一“完成”所需的客观证据 |
+| [项目意图](blueprints/intent.md) | 明确用户、问题、范围、约束与成功标准 |
+| [功能规格](blueprints/spec.md) | 记录行为、规则和验收场景 |
+| [实施计划](blueprints/plan.md) | 记录技术方案、影响范围和验证策略 |
+| [任务列表](blueprints/tasks.md) | 把计划拆成可独立验证的小任务 |
+| [架构决策记录](blueprints/adr.md) | 保存技术选择的原因和后果 |
+| [Issue](blueprints/issue.md) | 描述一个可交付的问题或需求 |
+| [Bug 报告](blueprints/bug-report.md) | 保存复现、证据、影响与回归要求 |
+| [PR 检查清单](blueprints/pr-checklist.md) | 审查 Diff、测试、兼容性和交付证据 |
+| [发布检查清单](blueprints/release-checklist.md) | 检查构建、部署、回滚和发布记录 |
+| [运行维护手册](blueprints/runbook.md) | 记录启动、观测、备份和故障处理 |
+| [会话交接](blueprints/handoff.md) | 让新 AI 会话从项目事实继续工作 |
+| [完成定义](blueprints/definition-of-done.md) | 统一“完成”所需的客观证据 |
 
 ## 每章如何使用
 
@@ -134,4 +134,4 @@
 
 ## 写作与维护
 
-章节结构、项目字段、命令和作者分工约定见 [写作与集成契约](WRITING_GUIDE.html。工具功能具有时效性，具体产品能力以官方最新文档为准；稳定的方法和验收原则不随工具界面变化而变化。
+章节结构、项目字段、命令和作者分工约定见 [写作与集成契约](writing-guide.md)。工具功能具有时效性，具体产品能力以官方最新文档为准；稳定的方法和验收原则不随工具界面变化而变化。

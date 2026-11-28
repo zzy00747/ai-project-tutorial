@@ -398,6 +398,6 @@ git commit -m "docs: record database recovery drill"
 ## 12. 参考资料
 
 - [SQLite：ALTER TABLE](https://sqlite.org/lang_altertable.html)——加列语法与限制。
-- [Python：sqlite3 Connection.backup](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.backup)——一致性备份 API。
-- [SQLite：PRAGMA integrity_check](https://sqlite.org/pragma.html#pragma_integrity_check)——数据库完整性检查。
+- [Python：sqlite3 Connection.backup](https://docs.python.org/3/library/sqlite3.html#sqlite3).Connection.backup)——一致性备份 API。
+- [SQLite：PRAGMA integrity_check](https://sqlite.org/pragma.html#pragma_integrity_chec)k)——数据库完整性检查。
 - [SQLite：Transaction](https://sqlite.org/lang_transaction.html)——事务与 `BEGIN IMMEDIATE` 行为。

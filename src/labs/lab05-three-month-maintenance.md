@@ -2,7 +2,7 @@
 
 > 实验成果：在不推翻项目的前提下，随机处理六个真实维护事件，形成可审计的三个月维护记录，并发布一个经过验证的补丁版本。
 
-本实验假设你已经完成 [第12章](../chapters/ch12-issue-driven-maintenance.html、[第13章](../chapters/ch13-change-and-refactoring.html、[第15章](../chapters/ch15-data-migration-recovery.html 和 [第16章](../chapters/ch16-long-term-maintenance.html。项目当前版本应为 v1.2，`subscriptions` 表已包含 `billing_cycle`。
+本实验假设你已经完成 [第12章](../chapters/ch12-issue-driven-maintenance.md)、[第13章](../chapters/ch13-change-and-refactoring.md)、[第15章](../chapters/ch15-data-migration-recovery.md) 和 [第16章](../chapters/ch16-long-term-maintenance.md)。项目当前版本应为 v1.2，`subscriptions` 表已包含 `billing_cycle`。
 
 ## 1. 实验目标
 
@@ -96,14 +96,14 @@ $draw
 
 每月按以下循环处理每张卡：
 
-1. 把事件写成 Issue 或 Bug Report，使用 [Issue 模板](../templates/issue.html 和 [Bug 报告模板](../templates/bug-report.html。
+1. 把事件写成 Issue 或 Bug Report，使用 [Issue 模板](../blueprints/issue.md) 和 [Bug 报告模板](../blueprints/bug-report.md)。
 2. 判断是否需要修改规格；功能变化必须先更新 Spec Delta。
 3. 建立单独分支，例如 `fix/m01-csv-billing-cycle`。
 4. 先写能暴露问题的测试或检查，再让 AI 修复。
 5. 让 AI 输出计划、影响文件和 Diff，不直接接受“已完成”。
 6. 运行相关测试、全量测试、Ruff 和架构检查。
-7. 按 [PR 检查清单](../templates/pr-checklist.html 人工审查。
-8. 合并后更新 [运行维护手册](../templates/runbook.html 或相关文档。
+7. 按 [PR 检查清单](../blueprints/pr-checklist.md) 人工审查。
+8. 合并后更新 [运行维护手册](../blueprints/runbook.md) 或相关文档。
 9. 在维护日志记录实际命令、证据、风险和耗时。
 
 每月结束时，若已有合并且验证的维护 PR，可按第11章和第16章流程发布补丁版本。不要为了凑版本号发布未验收内容。
@@ -226,11 +226,11 @@ docs/maintenance/lab05/
 
 ## 10. 与其他章节的关系
 
-- 缺陷和 Issue 流程见 [第12章](../chapters/ch12-issue-driven-maintenance.html。
-- 功能变化与重构见 [第13章](../chapters/ch13-change-and-refactoring.html。
-- 旧项目分析和基线建立见 [第14章](../chapters/ch14-legacy-modernization.html。
-- 数据库迁移、备份和恢复见 [第15章](../chapters/ch15-data-migration-recovery.html。
-- Renovate、安全审计、健康检查、文档漂移和自主度分级见 [第16章](../chapters/ch16-long-term-maintenance.html。
-- 完成定义参考 [完成定义模板](../templates/definition-of-done.html 和 [会话交接模板](../templates/handoff.html。
+- 缺陷和 Issue 流程见 [第12章](../chapters/ch12-issue-driven-maintenance.md)。
+- 功能变化与重构见 [第13章](../chapters/ch13-change-and-refactoring.md)。
+- 旧项目分析和基线建立见 [第14章](../chapters/ch14-legacy-modernization.md)。
+- 数据库迁移、备份和恢复见 [第15章](../chapters/ch15-data-migration-recovery.md)。
+- Renovate、安全审计、健康检查、文档漂移和自主度分级见 [第16章](../chapters/ch16-long-term-maintenance.md)。
+- 完成定义参考 [完成定义模板](../blueprints/definition-of-done.md) 和 [会话交接模板](../blueprints/handoff.md)。
 
 这个实验的目标不是让项目“看起来被维护过”，而是证明：三个月后，项目仍能通过客观检查被理解、修改、验证、发布和恢复。

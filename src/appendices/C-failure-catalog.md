@@ -28,7 +28,7 @@
 - **根因**：只有抽象描述，没有输入、输出、边界和验收场景。
 - **证据**：逐条检查需求是否对应测试、命令或可观察行为；找不到对应项就是缺口。
 - **恢复**：把无法验收的需求降级为开放问题；为核心场景补充 Given/When/Then。
-- **预防**：使用 [spec.md](../templates/spec.html 和 [definition-of-done.md](../templates/definition-of-done.html，规格完成前不进入实现。
+- **预防**：使用 [spec.md](../blueprints/spec.md) 和 [definition-of-done.md](../blueprints/definition-of-done.md)，规格完成前不进入实现。
 
 ### C.1.3 一个 PR 同时改功能、重构和格式
 
@@ -36,7 +36,7 @@
 - **根因**：没有任务边界；让 AI“顺便优化”了整个项目。
 - **证据**：`git diff --stat`、`git diff`，以及 PR 描述与关联 Issue/Spec 的对照。
 - **恢复**：关闭或拆分该 PR；把功能变更、重构和格式化分别提交。
-- **预防**：一个任务一个 PR；[pr-checklist.md](../templates/pr-checklist.html 中写明变更类型和不应触碰的目录。
+- **预防**：一个任务一个 PR；[pr-checklist.md](../blueprints/pr-checklist.md) 中写明变更类型和不应触碰的目录。
 
 ## C.2 运行与验证失败
 
@@ -96,7 +96,7 @@
 - **根因**：无关历史、工具输出和大文件占据注意力；没有压缩或交接。
 - **证据**：新会话只提供仓库和当前任务，观察结果是否改善。
 - **恢复**：保存交接文档，清理无关上下文，从最近绿色提交开始新的窄任务。
-- **预防**：使用 [handoff.md](../templates/handoff.html；长资料放 `references/` 或磁盘，按需读取。
+- **预防**：使用 [handoff.md](../blueprints/handoff.md)；长资料放 `references/` 或磁盘，按需读取。
 
 ### C.3.3 AI 在修复循环中制造新问题
 
